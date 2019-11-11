@@ -2,12 +2,12 @@ import { createSelector } from 'reselect';
 
 export const getProfile = state => state.profile;
 
-export const getCurrentUserProfile = createSelector(
+export const getUserProfiles = createSelector(
   getProfile,
-  profile => profile.user
+  profile => profile.cache
 );
 
-export const getProfiles = createSelector(
+export const getUserProfile = createSelector(
   getProfile,
   profile => profile.collection
 );

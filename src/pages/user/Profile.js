@@ -1,6 +1,9 @@
+import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet';
-import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
+import { Link } from 'react-router-dom';
 import {
   Container,
   Row,
@@ -10,9 +13,33 @@ import {
   ButtonGroup,
   Button
 } from 'react-bootstrap';
+import { actions as appActions } from 'reducers/application';
+import { actions as profileActions } from 'reducers/profile';
+import { isLoggedIn } from 'selectors/application';
+import { getUserProfile } from 'selectors/profile';
 
-export default class Profile extends Component {
+export class Profile extends Component {
+  static propTypes = {
+    actions: PropTypes.object.isRequired
+    // collection: PropTypes.array,
+    // currentUserId: PropTypes.any,
+    // loggedIn: PropTypes.bool.isRequired
+  };
+  constructor(props) {
+    super(props);
+    /* const { actions } = this.props;
+
+    actions.requestCurrentUserProfile();*/
+  }
+
+  componentDidMount() {
+    const { actions } = this.props;
+
+    actions.requestCurrentUserProfile();
+  }
   render() {
+    // const { currentUserId } = this.props;
+
     return (
       <Container>
         <Helmet title="Your Profile" />
@@ -276,3 +303,24 @@ export default class Profile extends Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  // currentUserId: getUser(state),
+  loggedIn: isLoggedIn(state),
+  collection: getUserProfile(state)
+});
+
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(
+    {
+      ...appActions,
+      ...profileActions
+    },
+    dispatch
+  )
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Profile);

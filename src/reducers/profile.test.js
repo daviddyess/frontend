@@ -2,8 +2,55 @@ import { reducer, types, actions } from './profile';
 
 describe('users reducer', () => {
   const error = { message: 'Failed' };
-  const user = [];
-  const profile = [];
+  const profile = {};
+  const collection = {};
+  const userId = 3;
+
+  it('has REQUEST_PROFILE action', () => {
+    expect(actions.requestProfile(userId)).toEqual({
+      type: types.REQUEST_PROFILE,
+      userId
+    });
+  });
+
+  it('reduces REQUEST_PROFILE action', () => {
+    const action = actions.requestProfile(userId);
+
+    expect(reducer({}, action)).toEqual({});
+  });
+
+  it('has REQUEST_PROFILE_SUCCESS action', () => {
+    expect(actions.requestProfileSuccess(profile)).toEqual({
+      type: types.REQUEST_PROFILE_SUCCESS,
+      profile
+    });
+  });
+
+  it('reduces REQUEST_PROFILE_SUCCESS action', () => {
+    const action = actions.requestProfileSuccess(profile);
+    const mockState = {
+      collection: {}
+    };
+
+    expect(reducer(mockState, action)).toEqual({
+      collection
+    });
+  });
+
+  it('has REQUEST_PROFILE_FAILURE action', () => {
+    expect(actions.requestProfileFailure(error)).toEqual({
+      type: types.REQUEST_PROFILE_FAILURE,
+      error
+    });
+  });
+
+  it('reduces REQUEST_PROFILE_FAILURE action', () => {
+    const action = actions.requestProfileFailure(error);
+
+    expect(reducer({}, action)).toEqual({
+      error
+    });
+  });
 
   it('has REQUEST_CURRENT_USER_PROFILE action', () => {
     expect(actions.requestCurrentUserProfile()).toEqual({
@@ -17,79 +64,46 @@ describe('users reducer', () => {
     expect(reducer({}, action)).toEqual({});
   });
 
-  it('has REQUEST_CURRENT_USER_PROFILE_SUCCESS action', () => {
-    expect(actions.requestCurrentUserProfileSuccess(profile)).toEqual({
-      type: types.REQUEST_CURRENT_USER_PROFILE_SUCCESS,
+  it('has UPDATE_PROFILE action', () => {
+    expect(actions.updateProfile({ profile })).toEqual({
+      type: types.UPDATE_PROFILE,
       profile
     });
   });
 
-  it('reduces REQUEST_CURRENT_USER_PROFILE_SUCCESS action', () => {
-    const action = actions.requestCurrentUserProfileSuccess(profile);
-    const mockState = {
-      user: []
-    };
-
-    expect(reducer(mockState, action)).toEqual({
-      user
-    });
-  });
-
-  it('has REQUEST_CURRENT_USER_PROFILE_FAILURE action', () => {
-    expect(actions.requestCurrentUserProfileFailure(error)).toEqual({
-      type: types.REQUEST_CURRENT_USER_PROFILE_FAILURE,
-      error
-    });
-  });
-
-  it('reduces REQUEST_CURRENT_USER_PROFILE_FAILURE action', () => {
-    const action = actions.requestCurrentUserProfileFailure(error);
-
-    expect(reducer({}, action)).toEqual({
-      error
-    });
-  });
-
-  it('has UPDATE_CURRENT_USER_PROFILE action', () => {
-    expect(actions.updateCurrentUserProfile({ profile })).toEqual({
-      type: types.UPDATE_CURRENT_USER_PROFILE,
-      profile
-    });
-  });
-
-  it('reduces UPDATE_CURRENT_USER_PROFILE action', () => {
-    const action = actions.updateCurrentUserProfile({ profile });
+  it('reduces UPDATE_PROFILE action', () => {
+    const action = actions.updateProfile({ profile });
 
     expect(reducer({}, action)).toEqual({});
   });
 
-  it('has UPDATE_CURRENT_USER_PROFILE_SUCCESS action', () => {
-    expect(actions.updateCurrentUserProfileSuccess({ profile })).toEqual({
-      type: types.UPDATE_CURRENT_USER_PROFILE_SUCCESS,
+  it('has UPDATE_PROFILE_SUCCESS action', () => {
+    expect(actions.updateProfileSuccess(profile)).toEqual({
+      type: types.UPDATE_PROFILE_SUCCESS,
       profile
     });
   });
 
-  it('reduces UPDATE_CURRENT_USER_PROFILE_SUCCESS action', () => {
-    const action = actions.updateCurrentUserProfileSuccess(profile);
+  it('reduces UPDATE_PROFILE_SUCCESS action', () => {
+    const action = actions.updateProfileSuccess(profile);
     const mockState = {
-      user: []
+      collection: {}
     };
 
     expect(reducer(mockState, action)).toEqual({
-      user
+      collection
     });
   });
 
-  it('has UPDATE_CURRENT_USER_PROFILE_FAILURE action', () => {
-    expect(actions.updateCurrentUserProfileFailure(error)).toEqual({
-      type: types.UPDATE_CURRENT_USER_PROFILE_FAILURE,
+  it('has UPDATE_PROFILE_FAILURE action', () => {
+    expect(actions.updateProfileFailure(error)).toEqual({
+      type: types.UPDATE_PROFILE_FAILURE,
       error
     });
   });
 
-  it('reduces UPDATE_CURRENT_USER_PROFILE_FAILURE action', () => {
-    const action = actions.updateCurrentUserProfileFailure(error);
+  it('reduces UPDATE_PROFILE_FAILURE action', () => {
+    const action = actions.updateProfileFailure(error);
 
     expect(reducer({}, action)).toEqual({
       error
