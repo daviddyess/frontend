@@ -106,13 +106,13 @@ export class Profile extends Component {
               )}
             </Card>
             {collection.bio ? (
-              <Card body className="text-left mb-3">
+              <Card body className="text-left">
                 {collection.bio}
               </Card>
             ) : (
               ''
             )}
-            <ButtonGroup>
+            <ButtonGroup className="mt-3">
               <Button className="button-animation" variant="primary">
                 <span>Message</span>
               </Button>
