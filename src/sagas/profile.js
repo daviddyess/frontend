@@ -1,18 +1,19 @@
-import { all, call, put, takeLatest, select } from 'redux-saga/effects';
+import MD5 from 'md5.js';
+import { all, call, put, take, takeLatest, select } from 'redux-saga/effects';
 import request from 'utils/request';
 import { actions, types } from 'reducers/profile';
 import { actions as toastActions } from 'reducers/toast';
-import { actions as appActions } from 'reducers/application';
+import { actions as appActions, types as appTypes } from 'reducers/application';
 // import { getUserProfiles } from 'selectors/profile';
 import { getUser } from 'selectors/application';
 
-function* requestProfileWorker({ userId }) {
+function* requestProfileWorker({ user }) {
   try {
     // const profile = yield select(getUserProfiles);
 
     // if (!profile[userId]) {
     const endpoint = {
-      url: `/user/${userId}/profile`,
+      url: `/user/${user.id}/profile`,
       method: 'GET'
     };
     const result = yield call(request.execute, { endpoint });
@@ -22,6 +23,8 @@ function* requestProfileWorker({ userId }) {
       const {
         response: { data }
       } = result;
+
+      data.gravatar = new MD5().update(user.email).digest('hex');
 
       yield put(actions.requestProfileSuccess(data));
     } else if (result.error) {
@@ -48,22 +51,43 @@ function* requestProfileWorker({ userId }) {
 
 function* requestCurrentUserProfileWorker() {
   try {
-    const userId = yield put(appActions.requestCurrentUser());
+    // eslint-disable-next-line no-console
+    console.log('IN THE SAGA');
+    // const userId = yield put(appActions.requestCurrentUser());
 
     // const profile = yield select(getUserProfiles);
 
+    let user = yield select(getUser);
+
+    if (!user) {
+      yield put(appActions.requestCurrentUser());
+      const currentUserResult = yield take([
+        appTypes.REQUEST_CURRENT_USER_SUCCESS,
+        appTypes.REQUEST_CURRENT_USER_FAILURE
+      ]);
+
+      if (currentUserResult.type === appTypes.REQUEST_CURRENT_USER_FAILURE) {
+        throw new Error('Failed to fetch current user!');
+      }
+
+      user = currentUserResult.user;
+
+      if (!user) {
+        throw new Error('Got invalid response to current user request!');
+      }
+    }
+
     // if (!profile[userId.id]) {
     // eslint-disable-next-line no-console
-    console.log(JSON.stringify(userId));
-    yield call(actions.requestProfile(userId.id));
+    console.log(JSON.stringify(user));
+    yield put(
+      actions.requestProfile({ id: user.id, email: user.emailAddress })
+    );
     // } else {
     // throw new Error('Failed to get current user profile!');
     // }
   } catch (error) {
     const { message } = error;
-
-    // eslint-disable-next-line no-console
-    console.log(message);
 
     yield put(actions.requestProfileFailure(error));
     yield put(

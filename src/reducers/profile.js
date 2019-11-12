@@ -10,9 +10,9 @@ export const types = buildActions('profile', [
   'UPDATE_PROFILE_FAILURE'
 ]);
 
-const requestProfile = ({ userId }) => ({
+const requestProfile = user => ({
   type: types.REQUEST_PROFILE,
-  userId
+  user
 });
 
 const requestProfileSuccess = profile => ({
