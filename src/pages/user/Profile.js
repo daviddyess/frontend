@@ -21,6 +21,7 @@ import { getUserProfile } from 'selectors/profile';
 
 export class Profile extends Component {
   static propTypes = {
+    match: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
     collection: PropTypes.object,
     // currentUserId: PropTypes.any,
@@ -28,9 +29,17 @@ export class Profile extends Component {
   };
   constructor(props) {
     super(props);
-    const { actions } = this.props;
+    const {
+      actions,
+      match: { params, path }
+    } = this.props;
 
-    actions.requestCurrentUserProfile();
+    if (path === '/user/profile') {
+      actions.requestCurrentUserProfile();
+    }
+    if (path === '/user/:userName') {
+      actions.requestProfile({ name: params.userName });
+    }
   }
 
   get Gravatar() {
