@@ -4,37 +4,97 @@ import request from 'utils/request';
 import { actions, types } from 'reducers/profile';
 import { actions as toastActions } from 'reducers/toast';
 import { actions as appActions, types as appTypes } from 'reducers/application';
-// import { getUserProfiles } from 'selectors/profile';
+import { getUserMap, getUserProfiles } from 'selectors/profile';
 import { getUser } from 'selectors/application';
 
 function* requestProfileWorker({ user }) {
   try {
-    // const profile = yield select(getUserProfiles);
+    const profile = yield select(getUserProfiles);
 
-    // if (!profile[userId]) {
-    const endpoint = {
-      url: `/user/${user.id}/profile`,
-      method: 'GET'
-    };
-    const result = yield call(request.execute, { endpoint });
+    if (user.name && !user.id) {
+      const userNames = yield select(getUserMap);
 
-    // update user in state or throw an error
-    if (result.success) {
-      const {
-        response: { data }
-      } = result;
+      if (!userNames[user.name]) {
+        const endpoint = {
+          url: `/user/${user.name}`,
+          method: 'GET'
+        };
+        const result = yield call(request.execute, { endpoint });
 
-      data.gravatar = new MD5().update(user.email).digest('hex');
+        // update profile in state or throw an error
+        if (result.success) {
+          const {
+            response: { data }
+          } = result;
 
-      yield put(actions.requestProfileSuccess(data));
-    } else if (result.error) {
-      throw result.error;
-    } else {
-      throw new Error('Failed to get user profile!');
+          // eslint-disable-next-line no-console
+          console.log(JSON.stringify(data));
+          profile[data.userId] = {
+            name: data.name,
+            location: data.location,
+            bio: data.bio,
+            url: data.url,
+            gravatar: new MD5().update(data.User.emailAddress).digest('hex')
+          };
+          userNames[user.name] = {
+            userId: data.userId
+          };
+          user = {
+            ...user,
+            id: data.userId
+          };
+          yield put(
+            actions.requestProfileSuccess({
+              request: profile[data.userId],
+              cache: profile
+            })
+          );
+          yield put(actions.mapUser(userNames));
+        } else if (result.error) {
+          throw result.error;
+        } else {
+          throw new Error('Failed to get user profile by username!');
+        }
+      } else {
+        user = {
+          ...user,
+          id: userNames[user.name].userId
+        };
+      }
     }
-    // } else {
-    //  yield put(actions.requestProfileSuccess(profile));
-    // }
+
+    if (!profile[user.id]) {
+      const endpoint = {
+        url: `/user/${user.id}/profile`,
+        method: 'GET'
+      };
+      const result = yield call(request.execute, { endpoint });
+
+      // update profile in state or throw an error
+      if (result.success) {
+        const {
+          response: { data }
+        } = result;
+
+        data.gravatar = new MD5().update(user.email).digest('hex');
+        profile[user.id] = data;
+
+        yield put(
+          actions.requestProfileSuccess({ request: data, cache: profile })
+        );
+      } else if (result.error) {
+        throw result.error;
+      } else {
+        throw new Error('Failed to get user profile!');
+      }
+    } else {
+      yield put(
+        actions.requestProfileSuccess({
+          request: profile[user.id],
+          cache: profile
+        })
+      );
+    }
   } catch (error) {
     const { message } = error;
 
@@ -51,12 +111,6 @@ function* requestProfileWorker({ user }) {
 
 function* requestCurrentUserProfileWorker() {
   try {
-    // eslint-disable-next-line no-console
-    console.log('IN THE SAGA');
-    // const userId = yield put(appActions.requestCurrentUser());
-
-    // const profile = yield select(getUserProfiles);
-
     let user = yield select(getUser);
 
     if (!user) {
@@ -73,19 +127,16 @@ function* requestCurrentUserProfileWorker() {
       user = currentUserResult.user;
 
       if (!user) {
-        throw new Error('Got invalid response to current user request!');
+        throw new Error('Received invalid response to current user request!');
       }
     }
 
-    // if (!profile[userId.id]) {
-    // eslint-disable-next-line no-console
-    console.log(JSON.stringify(user));
     yield put(
-      actions.requestProfile({ id: user.id, email: user.emailAddress })
+      actions.requestProfile({
+        id: user.id,
+        email: user.emailAddress
+      })
     );
-    // } else {
-    // throw new Error('Failed to get current user profile!');
-    // }
   } catch (error) {
     const { message } = error;
 
