@@ -64,7 +64,8 @@ export const actions = {
 export const initialState = {
   cache: [],
   collection: [],
-  currentUserId: null,
+  currentUser: null,
+  userId: null,
   userNames: []
 };
 
@@ -74,7 +75,8 @@ export const reducer = (state = initialState, action = {}) => {
       return {
         ...state,
         cache: action.profile.cache,
-        collection: action.profile.request
+        collection: action.profile.request,
+        currentUser: action.profile.currentUser
       };
     case types.REQUEST_PROFILE_FAILURE:
       return {
@@ -84,7 +86,14 @@ export const reducer = (state = initialState, action = {}) => {
     case types.UPDATE_PROFILE_SUCCESS:
       return {
         ...state,
-        collection: action.profile
+        cache: {
+          ...state.cache,
+          ...action.profile
+        },
+        collection: {
+          ...state.collection,
+          ...action.profile
+        }
       };
     case types.UPDATE_PROFILE_FAILURE:
       return {

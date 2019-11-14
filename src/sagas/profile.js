@@ -7,11 +7,35 @@ import { actions as appActions, types as appTypes } from 'reducers/application';
 import { getUserMap, getUserProfiles } from 'selectors/profile';
 import { getUser } from 'selectors/application';
 
+function* getCurrentUser() {
+  let user = yield select(getUser);
+
+  if (!user) {
+    yield put(appActions.requestCurrentUser());
+    const currentUserResult = yield take([
+      appTypes.REQUEST_CURRENT_USER_SUCCESS,
+      appTypes.REQUEST_CURRENT_USER_FAILURE
+    ]);
+
+    if (currentUserResult.type === appTypes.REQUEST_CURRENT_USER_FAILURE) {
+      throw new Error('Failed to fetch current user!');
+    }
+
+    user = currentUserResult.user;
+
+    if (!user) {
+      throw new Error('Received invalid response to current user request!');
+    }
+  }
+  return user;
+}
+
 function* requestProfileWorker({ user }) {
   try {
-    const profile = yield select(getUserProfiles);
+    const currentUser = yield call(getCurrentUser);
 
     if (user.name && !user.id) {
+      const profile = yield select(getUserProfiles);
       const userNames = yield select(getUserMap);
 
       if (!userNames[user.name]) {
@@ -27,14 +51,20 @@ function* requestProfileWorker({ user }) {
             response: { data }
           } = result;
 
-          // eslint-disable-next-line no-console
-          console.log(JSON.stringify(data));
+          const {
+            name,
+            bio,
+            location,
+            User: { emailAddress },
+            url
+          } = data;
+
           profile[data.userId] = {
-            name: data.name,
-            location: data.location,
-            bio: data.bio,
-            url: data.url,
-            gravatar: new MD5().update(data.User.emailAddress).digest('hex')
+            name,
+            bio,
+            location,
+            gravatar: new MD5().update(emailAddress).digest('hex'),
+            url
           };
           userNames[user.name] = {
             userId: data.userId
@@ -46,7 +76,11 @@ function* requestProfileWorker({ user }) {
           yield put(
             actions.requestProfileSuccess({
               request: profile[data.userId],
-              cache: profile
+              cache: profile,
+              currentUser:
+                user.currentUser || currentUser.id === data.userId
+                  ? true
+                  : false
             })
           );
           yield put(actions.mapUser(userNames));
@@ -62,6 +96,8 @@ function* requestProfileWorker({ user }) {
         };
       }
     }
+
+    const profile = yield select(getUserProfiles);
 
     if (!profile[user.id]) {
       const endpoint = {
@@ -80,7 +116,12 @@ function* requestProfileWorker({ user }) {
         profile[user.id] = data;
 
         yield put(
-          actions.requestProfileSuccess({ request: data, cache: profile })
+          actions.requestProfileSuccess({
+            request: data,
+            cache: profile,
+            currentUser:
+              user.currentUser || currentUser.id === user.id ? true : false
+          })
         );
       } else if (result.error) {
         throw result.error;
@@ -91,7 +132,9 @@ function* requestProfileWorker({ user }) {
       yield put(
         actions.requestProfileSuccess({
           request: profile[user.id],
-          cache: profile
+          cache: profile,
+          currentUser:
+            user.currentUser || currentUser.id === user.id ? true : false
         })
       );
     }
@@ -111,29 +154,12 @@ function* requestProfileWorker({ user }) {
 
 function* requestCurrentUserProfileWorker() {
   try {
-    let user = yield select(getUser);
-
-    if (!user) {
-      yield put(appActions.requestCurrentUser());
-      const currentUserResult = yield take([
-        appTypes.REQUEST_CURRENT_USER_SUCCESS,
-        appTypes.REQUEST_CURRENT_USER_FAILURE
-      ]);
-
-      if (currentUserResult.type === appTypes.REQUEST_CURRENT_USER_FAILURE) {
-        throw new Error('Failed to fetch current user!');
-      }
-
-      user = currentUserResult.user;
-
-      if (!user) {
-        throw new Error('Received invalid response to current user request!');
-      }
-    }
+    const user = yield call(getCurrentUser);
 
     yield put(
       actions.requestProfile({
         id: user.id,
+        currentUser: true,
         email: user.emailAddress
       })
     );
@@ -153,21 +179,31 @@ function* requestCurrentUserProfileWorker() {
 
 function* updateProfileWorker({ profile }) {
   try {
-    const userId = yield select(getUser);
+    const { id } = yield call(getCurrentUser);
 
+    const refresh = [];
+
+    refresh[id] = false;
     const endpoint = {
-      url: `/user/${userId}/profile`,
+      url: `/user/${id}/profile`,
       method: 'PUT'
     };
-    const result = yield call(request.execute, { endpoint, profile });
 
-    // update user in state or throw an error
+    const data = {
+      ...profile
+    };
+    const result = yield call(request.execute, { endpoint, data });
+
     if (result.success) {
-      const {
-        response: { data }
-      } = result;
-
-      yield put(actions.updateProfileSuccess(data));
+      yield put(actions.updateProfileSuccess(refresh));
+      yield put(actions.requestCurrentUserProfile());
+      yield put(
+        toastActions.popToast({
+          title: 'Profile',
+          icon: 'times-circle',
+          message: 'User profile updated!'
+        })
+      );
     } else if (result.error) {
       throw result.error;
     } else {
