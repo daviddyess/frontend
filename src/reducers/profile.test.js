@@ -1,20 +1,23 @@
 import { reducer, types, actions } from './profile';
 
-describe('users reducer', () => {
+describe('Profile reducer', () => {
   const error = { message: 'Failed' };
-  const profile = {};
-  const collection = {};
-  const userId = 3;
+  const profile = { request: [], cache: [], currentUser: false };
+  const updateProfile = [{}];
+  const collection = [];
+  const cache = [];
+  const currentUser = false;
+  const user = 3;
 
   it('has REQUEST_PROFILE action', () => {
-    expect(actions.requestProfile(userId)).toEqual({
+    expect(actions.requestProfile(user)).toEqual({
       type: types.REQUEST_PROFILE,
-      userId
+      user
     });
   });
 
   it('reduces REQUEST_PROFILE action', () => {
-    const action = actions.requestProfile(userId);
+    const action = actions.requestProfile(user);
 
     expect(reducer({}, action)).toEqual({});
   });
@@ -28,12 +31,11 @@ describe('users reducer', () => {
 
   it('reduces REQUEST_PROFILE_SUCCESS action', () => {
     const action = actions.requestProfileSuccess(profile);
-    const mockState = {
-      collection: {}
-    };
 
-    expect(reducer(mockState, action)).toEqual({
-      collection
+    expect(reducer({}, action)).toEqual({
+      cache,
+      collection,
+      currentUser
     });
   });
 
@@ -65,14 +67,14 @@ describe('users reducer', () => {
   });
 
   it('has UPDATE_PROFILE action', () => {
-    expect(actions.updateProfile({ profile })).toEqual({
+    expect(actions.updateProfile(profile)).toEqual({
       type: types.UPDATE_PROFILE,
       profile
     });
   });
 
   it('reduces UPDATE_PROFILE action', () => {
-    const action = actions.updateProfile({ profile });
+    const action = actions.updateProfile(profile);
 
     expect(reducer({}, action)).toEqual({});
   });
@@ -85,13 +87,11 @@ describe('users reducer', () => {
   });
 
   it('reduces UPDATE_PROFILE_SUCCESS action', () => {
-    const action = actions.updateProfileSuccess(profile);
-    const mockState = {
-      collection: {}
-    };
+    const action = actions.updateProfileSuccess(updateProfile);
 
-    expect(reducer(mockState, action)).toEqual({
-      collection
+    expect(reducer({}, action)).toEqual({
+      collection: { '0': {} },
+      cache: { '0': {} }
     });
   });
 

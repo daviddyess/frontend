@@ -7,7 +7,7 @@ import { actions as appActions, types as appTypes } from 'reducers/application';
 import { getUserMap, getUserProfiles } from 'selectors/profile';
 import { getUser } from 'selectors/application';
 
-function* getCurrentUser() {
+export function* getCurrentUser() {
   let user = yield select(getUser);
 
   if (!user) {

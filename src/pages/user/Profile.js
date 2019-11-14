@@ -26,7 +26,7 @@ export class Profile extends Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
-    collection: PropTypes.object,
+    collection: PropTypes.any,
     currentUser: PropTypes.bool,
     loggedIn: PropTypes.bool.isRequired,
     editting: PropTypes.bool.isRequired
@@ -39,6 +39,7 @@ export class Profile extends Component {
     } = this.props;
 
     this.state = { editting: false };
+
     if (path === '/user/profile') {
       actions.requestCurrentUserProfile();
     }
