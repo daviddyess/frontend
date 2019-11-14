@@ -7,6 +7,7 @@ import {
   faCheck,
   faCity,
   faGlobe,
+  faInfoCircle,
   faTimesCircle
 } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -22,6 +23,7 @@ library.add(
   faCheck,
   faCity,
   faGlobe,
+  faInfoCircle,
   faTimesCircle,
   fasHeart,
   farHeart,
