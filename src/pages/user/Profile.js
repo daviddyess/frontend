@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { Link } from 'react-router-dom';
+import { Form as FinalForm, Field } from 'react-final-form';
 import {
   Container,
   Row,
@@ -11,21 +12,24 @@ import {
   Card,
   CardGroup,
   ButtonGroup,
-  Button
+  Button,
+  Form,
+  InputGroup
 } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { actions as appActions } from 'reducers/application';
 import { actions as profileActions } from 'reducers/profile';
 import { isLoggedIn } from 'selectors/application';
-import { getUserProfile } from 'selectors/profile';
+import { getCurrentUser, getUserProfile } from 'selectors/profile';
 
 export class Profile extends Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     actions: PropTypes.object.isRequired,
     collection: PropTypes.object,
-    // currentUserId: PropTypes.any,
-    loggedIn: PropTypes.bool.isRequired
+    currentUser: PropTypes.bool,
+    loggedIn: PropTypes.bool.isRequired,
+    editting: PropTypes.bool.isRequired
   };
   constructor(props) {
     super(props);
@@ -34,12 +38,16 @@ export class Profile extends Component {
       match: { params, path }
     } = this.props;
 
+    this.state = { editting: false };
     if (path === '/user/profile') {
       actions.requestCurrentUserProfile();
     }
     if (path === '/user/:userName') {
       actions.requestProfile({ name: params.userName });
     }
+
+    this.handleEditor = this.handleEditor.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   get Gravatar() {
@@ -63,8 +71,137 @@ export class Profile extends Component {
     return <FontAwesomeIcon icon="globe" />;
   }
 
+  get bioIcon() {
+    return <FontAwesomeIcon icon="info-circle" />;
+  }
+
+  handleEditor(toggle) {
+    if (toggle) {
+      this.setState({ editting: true });
+    } else {
+      this.setState({ editting: false });
+    }
+  }
+
+  handleSubmit(values) {
+    const { actions } = this.props;
+
+    actions.updateProfile(values);
+    this.setState({ editting: false });
+  }
+
+  profileEditor() {
+    const {
+      collection: { bio, location, url },
+      currentUser
+    } = this.props;
+
+    if (currentUser) {
+      return (
+        <Card body>
+          <FinalForm
+            onSubmit={this.handleSubmit}
+            initialValues={{ bio, location, url }}
+            render={({ handleSubmit, submitting }) => (
+              <Form
+                noValidate
+                onSubmit={handleSubmit}
+                initialValues={{ bio, location, url }}
+              >
+                <Form.Row>
+                  <Field name="location">
+                    {({ input }) => (
+                      <Form.Group as={Col}>
+                        <InputGroup>
+                          <InputGroup.Prepend>
+                            <InputGroup.Text id="inputGroupPrepend">
+                              {this.locationIcon}
+                            </InputGroup.Text>
+                          </InputGroup.Prepend>
+                          <Form.Control
+                            {...input}
+                            type="text"
+                            placeholder="Location"
+                            aria-describedby="inputGroupPrepend"
+                          />
+                        </InputGroup>
+                      </Form.Group>
+                    )}
+                  </Field>
+                </Form.Row>
+                <Form.Row>
+                  <Field name="url">
+                    {({ input }) => (
+                      <Form.Group as={Col}>
+                        <InputGroup>
+                          <InputGroup.Prepend>
+                            <InputGroup.Text id="inputGroupPrepend">
+                              {this.webIcon}
+                            </InputGroup.Text>
+                          </InputGroup.Prepend>
+                          <Form.Control
+                            {...input}
+                            type="text"
+                            placeholder="example.com"
+                          />
+                        </InputGroup>
+                      </Form.Group>
+                    )}
+                  </Field>
+                </Form.Row>
+                <Form.Row>
+                  <Field name="bio">
+                    {({ input }) => (
+                      <Form.Group as={Col}>
+                        <InputGroup>
+                          <InputGroup.Prepend>
+                            <InputGroup.Text id="inputGroupPrepend">
+                              {this.bioIcon}
+                            </InputGroup.Text>
+                          </InputGroup.Prepend>
+                          <Form.Control
+                            {...input}
+                            as="textarea"
+                            placeholder="Info"
+                            style={{ 'min-height': '400px' }}
+                          />
+                        </InputGroup>
+                      </Form.Group>
+                    )}
+                  </Field>
+                </Form.Row>
+                <Form.Row>
+                  <Form.Group as={Col}>
+                    <Button
+                      className="button-animation"
+                      variant="primary"
+                      type="submit"
+                      disabled={submitting}
+                    >
+                      <span>Save</span>
+                    </Button>
+                  </Form.Group>
+                  <Form.Group as={Col}>
+                    <Button
+                      onClick={e => this.handleEditor(false, e)}
+                      className="button-animation"
+                      variant="primary"
+                    >
+                      <span>Cancel</span>
+                    </Button>
+                  </Form.Group>
+                </Form.Row>
+              </Form>
+            )}
+          />
+        </Card>
+      );
+    }
+  }
+
   render() {
-    const { collection } = this.props;
+    const { collection, currentUser } = this.props;
+    const { editting } = this.state;
 
     return (
       <Container>
@@ -83,7 +220,7 @@ export class Profile extends Component {
             <Card>
               <Card.Img variant="top" src={this.Gravatar} />
               <Card.Header as="h1">{collection.name}</Card.Header>
-              {collection.location || collection.url ? (
+              {!editting && (collection.location || collection.url) ? (
                 <Card.Body>
                   {collection.location ? (
                     <div>
@@ -105,24 +242,37 @@ export class Profile extends Component {
                 ''
               )}
             </Card>
-            {collection.bio ? (
+            {!editting && collection.bio ? (
               <Card body className="text-left">
                 {collection.bio}
               </Card>
             ) : (
               ''
             )}
-            <ButtonGroup className="mt-3">
-              <Button className="button-animation" variant="primary">
-                <span>Message</span>
-              </Button>
-              <Button className="button-animation" variant="primary">
-                <span>Follow</span>
-              </Button>
-              <Button className="button-animation" variant="primary">
-                <span>Report</span>
-              </Button>
-            </ButtonGroup>
+            {!currentUser ? (
+              <ButtonGroup className="mt-3">
+                <Button className="button-animation" variant="primary">
+                  <span>Message</span>
+                </Button>
+                <Button className="button-animation" variant="primary">
+                  <span>Follow</span>
+                </Button>
+                <Button className="button-animation" variant="primary">
+                  <span>Report</span>
+                </Button>
+              </ButtonGroup>
+            ) : (
+              !editting && (
+                <Button
+                  onClick={e => this.handleEditor(true, e)}
+                  className="button-animation mt-3"
+                  variant="primary"
+                >
+                  <span>Edit Profile</span>
+                </Button>
+              )
+            )}
+            {editting && this.profileEditor()}
           </Col>
           <Col>
             <Row className="text-center">
@@ -359,9 +509,10 @@ export class Profile extends Component {
 }
 
 const mapStateToProps = state => ({
-  // currentUserId: getUser(state),
+  currentUser: getCurrentUser(state),
   loggedIn: isLoggedIn(state),
-  collection: getUserProfile(state)
+  collection: getUserProfile(state),
+  editting: false
 });
 
 const mapDispatchToProps = dispatch => ({
