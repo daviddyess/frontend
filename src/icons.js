@@ -17,7 +17,10 @@ import {
   faUser,
   faUsers,
   faUsersCog,
-  faUserShield
+  faUserShield,
+  faCity,
+  faGlobe,
+  faInfoCircle
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faCheckSquare,
@@ -35,6 +38,9 @@ library.add(
   faDatabase,
   faEyeDropper,
   faFire,
+  faCity,
+  faGlobe,
+  faInfoCircle,
   fasHeart,
   farHeart,
   faPlus,

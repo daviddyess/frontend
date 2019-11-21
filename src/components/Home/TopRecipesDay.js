@@ -18,7 +18,7 @@ export class TopRecipesDay extends Component {
               />
               <Card.Body>
                 <Card.Title>
-                  <Link to="#">Strawberry Milkshake</Link>
+                  <Link to="/user/mixnshit">Strawberry Milkshake</Link>
                 </Card.Title>
                 <Card.Text>by David Dyess</Card.Text>
               </Card.Body>

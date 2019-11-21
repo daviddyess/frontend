@@ -7,6 +7,7 @@ import flavors from './flavors';
 import roles from './roles';
 import toast from './toast';
 import users from './users';
+import profile from './profile';
 
 describe('index saga', () => {
   it('forks all sagas', () => {
@@ -15,7 +16,11 @@ describe('index saga', () => {
     const result = gen.next();
 
     expect(result.value).toEqual(
-      all([application, dashboard, flavors, roles, toast, users].map(fork))
+      all(
+        [application, dashboard, flavors, profile, roles, toast, users].map(
+          fork
+        )
+      )
     );
   });
 });
