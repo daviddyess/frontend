@@ -1,49 +1,184 @@
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import { Helmet } from 'react-helmet';
 import React, { Component } from 'react';
-import { Container } from 'react-bootstrap';
+import { Button, Col, Container, Row, Table } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import FlavorData from '../data/flavors.json';
+import { actions as flavorsActions } from 'reducers/flavors';
+import { getAllFlavors, getFlavorsPager } from 'selectors/flavors';
 
-export default class Flavors extends Component {
-  constructor(...args) {
-    super(...args);
+export class Flavors extends Component {
+  static propTypes = {
+    actions: PropTypes.object.isRequired,
+    collection: PropTypes.array,
+    pager: PropTypes.object
+  };
 
-    this.state = {
-      validated: false,
-      amount: '0',
-      strength: '0',
-      data: FlavorData
-    };
+  constructor(props) {
+    super(props);
+
+    const { actions } = this.props;
+
+    actions.requestFlavors({ page: 1, limit: 20 });
+
+    this.state = { limit: 20, page: 1 };
+    this.handlePageChange = this.changePage.bind(this);
+    this.handleLimitChange = this.changeLimit.bind(this);
+    this.handleLimitUpdate = this.updateLimit.bind(this);
   }
 
-  handleUserInput(e) {
-    const { name, value } = e.target;
+  pagerCounter() {
+    const { pages } = this.props.pager;
 
-    this.setState({ [name]: value });
-  }
+    let i = 1;
 
-  handleSubmit(event) {
-    const form = event.currentTarget;
+    const pager = [];
 
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
+    while (i <= pages) {
+      pager[i] = i;
+      i++;
     }
-    this.setState({ validated: true });
+    return pager;
+  }
+
+  changePage(page) {
+    const { actions, pager } = this.props;
+
+    this.setState({ page: page.target.value });
+    actions.requestFlavors({ ...pager, page: Number(page.target.value) });
+  }
+
+  changeLimit(limit) {
+    this.setState({ limit: limit.target.value });
+  }
+
+  updateLimit() {
+    const { actions, pager } = this.props;
+    const { limit } = this.state;
+
+    actions.requestFlavors({ ...pager, limit: Number(limit) });
   }
 
   render() {
-    const { data } = this.state;
+    const { collection, pager } = this.props;
 
     return (
       <Container>
         <Helmet title="Flavors" />
-        {data.map((flavor, index) => (
-          <div key={index}>
-            {flavor.vendor.abbreviation} {flavor.name}
-          </div>
-        ))}
+        <Container fluid={true}>
+          <Row className="text-center">
+            <Col>
+              <h1>Flavors</h1>
+            </Col>
+          </Row>
+          <Row className="pb-2">
+            <Col xs={3}>
+              <input
+                type="number"
+                min="20"
+                max="200"
+                step="20"
+                className="form-control"
+                onChange={this.handleLimitChange}
+                onBlur={this.handleLimitUpdate}
+                value={this.state.limit}
+              />
+            </Col>
+            <Col className="text-right">
+              <select
+                value={this.state.page}
+                onChange={this.handlePageChange}
+                onBlur={this.handlePageChange}
+              >
+                {this.pagerCounter().map((value, i) => (
+                  <option value={value} key={i}>
+                    Page {value}
+                  </option>
+                ))}
+              </select>
+            </Col>
+          </Row>
+        </Container>
+        <Table responsive striped bordered hover size="sm">
+          <thead>
+            <tr className="text-center">
+              <th>Stash</th>
+              <th>ID</th>
+              <th>Vendor</th>
+              <th>Name</th>
+              <th>Slug</th>
+              <th>Density</th>
+            </tr>
+          </thead>
+          <tbody>
+            {collection.map((flavor, index) => {
+              return (
+                <tr key={index}>
+                  <td className="text-center">
+                    <Button>
+                      <FontAwesomeIcon icon="plus" />
+                    </Button>
+                  </td>
+                  <td className="text-center">{flavor.id}</td>
+                  <td>{flavor.Vendor.name}</td>
+                  <td>{flavor.name}</td>
+                  <td className="text-center">{flavor.slug}</td>
+                  <td className="text-center">{flavor.density}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </Table>
+        <Container fluid={true}>
+          <Row>
+            <Col xs={3}>
+              <input
+                type="number"
+                min="20"
+                max="200"
+                step="20"
+                className="form-control"
+                onChange={this.handleLimitChange}
+                onBlur={this.handleLimitUpdate}
+                value={this.state.limit}
+              />
+            </Col>
+            <Col className="text-right">
+              <select
+                value={this.state.page}
+                onChange={this.handlePageChange}
+                onBlur={this.handlePageChange}
+              >
+                {this.pagerCounter().map((value, i) => (
+                  <option value={value} key={i}>
+                    Page {value}
+                  </option>
+                ))}
+              </select>
+            </Col>
+          </Row>
+          <Row>
+            <Col>{pager.count} Flavors</Col>
+            <Col className="text-right">{pager.pages} Pages</Col>
+          </Row>
+        </Container>
       </Container>
     );
   }
 }
+
+const mapStateToProps = state => ({
+  collection: getAllFlavors(state),
+  pager: getFlavorsPager(state)
+});
+
+const mapDispatchToProps = dispatch => ({
+  actions: bindActionCreators(flavorsActions, dispatch)
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Flavors);
