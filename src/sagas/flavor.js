@@ -161,10 +161,67 @@ function* removeStashWorker({ flavor }) {
   }
 }
 
+function* updateStashWorker({ flavor }) {
+  try {
+    let user = yield select(getUser);
+
+    if (user === null) {
+      yield put(appActions.requestCurrentUser());
+      yield take([
+        appTypes.REQUEST_CURRENT_USER_SUCCESS,
+        appTypes.REQUEST_CURRENT_USER_FAILURE
+      ]);
+      user = yield select(getUser);
+    }
+
+    const endpoint = {
+      url: `/user/${user.id}/flavor/${flavor.flavorId}`,
+      method: 'PUT'
+    };
+
+    const data = {
+      minMillipercent: flavor.minMillipercent * 1000,
+      maxMillipercent: flavor.maxMillipercent * 1000
+    };
+
+    const result = yield call(request.execute, { endpoint, data });
+
+    if (result.success) {
+      yield put(actions.updateStashSuccess());
+      yield put(
+        toastActions.popToast({
+          title: 'Stash Update',
+          icon: 'times-circle',
+          message: `Flavor ID ${flavor.flavorId} successfully updated!`
+        })
+      );
+    } else if (result.error) {
+      throw result.error;
+    } else {
+      throw new Error(`Failed to update Stash Flavor ID ${flavor.flavorId}!`);
+    }
+  } catch (error) {
+    const { message } = error;
+
+    // eslint-disable-next-line
+    console.dir(error);
+
+    yield put(actions.updateStashFailure(error));
+    yield put(
+      toastActions.popToast({
+        title: 'Error',
+        icon: 'times-circle',
+        message
+      })
+    );
+  }
+}
+
 export const workers = {
   requestStashWorker,
   addStashWorker,
-  removeStashWorker
+  removeStashWorker,
+  updateStashWorker
 };
 
 function* requestStashWatcher() {
@@ -179,10 +236,15 @@ function* removeStashWatcher() {
   yield takeLatest(types.REMOVE_FROM_STASH, removeStashWorker);
 }
 
+function* updateStashWatcher() {
+  yield takeLatest(types.UPDATE_STASH, updateStashWorker);
+}
+
 export const watchers = {
   requestStashWatcher,
   addStashWatcher,
-  removeStashWatcher
+  removeStashWatcher,
+  updateStashWatcher
 };
 
 export default function* saga() {
