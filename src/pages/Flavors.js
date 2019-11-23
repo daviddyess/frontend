@@ -3,30 +3,38 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { Helmet } from 'react-helmet';
 import React, { Component } from 'react';
-import { Button, Col, Container, Row, Table } from 'react-bootstrap';
+import { Col, Container, Form, Row, Table } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+import { actions as flavorActions } from 'reducers/flavor';
 import { actions as flavorsActions } from 'reducers/flavors';
+import { getStash } from 'selectors/flavor';
 import { getAllFlavors, getFlavorsPager } from 'selectors/flavors';
 
 export class Flavors extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     collection: PropTypes.array,
-    pager: PropTypes.object
+    pager: PropTypes.object,
+    stash: PropTypes.array
   };
 
   constructor(props) {
     super(props);
 
-    const { actions } = this.props;
-
-    actions.requestFlavors({ page: 1, limit: 20 });
-
-    this.state = { limit: 20, page: 1 };
+    this.state = { limit: 20, page: 1, stashControl: false };
     this.handlePageChange = this.changePage.bind(this);
     this.handleLimitChange = this.changeLimit.bind(this);
     this.handleLimitUpdate = this.updateLimit.bind(this);
+    this.handleStashControl = this.stashController.bind(this);
+    this.handleAddToStash = this.addToStash.bind(this);
+    this.handleRemoveFromStash = this.removeFromStash.bind(this);
+  }
+
+  componentDidMount() {
+    const { actions } = this.props;
+
+    actions.requestFlavors({ page: 1, limit: 20 });
+    actions.requestStash();
   }
 
   pagerCounter() {
@@ -61,8 +69,78 @@ export class Flavors extends Component {
     actions.requestFlavors({ ...pager, limit: Number(limit) });
   }
 
+  stashController(event) {
+    const { stash } = this.props;
+    const { holdings: stashMap } = this.state;
+
+    if (!stashMap) {
+      const holdings = [];
+
+      stash.map(flavor => {
+        holdings[flavor.flavorId] = true;
+      });
+      this.setState({ holdings });
+    }
+    const target = event.target;
+    const checked = target.checked;
+    const name = target.name;
+
+    this.setState({
+      [name]: checked
+    });
+  }
+
+  addToStash(id) {
+    const { actions } = this.props;
+
+    actions.addStash({ id });
+
+    const { holdings } = this.state;
+
+    holdings[id] = true;
+
+    this.setState({ holdings });
+  }
+
+  removeFromStash(id) {
+    const { actions } = this.props;
+
+    actions.removeStash({ id });
+
+    const { holdings } = this.state;
+
+    holdings[id] = false;
+
+    this.setState({ holdings });
+  }
+
+  inStashIcon(id) {
+    return (
+      <FontAwesomeIcon
+        onClick={e => this.handleRemoveFromStash(id, e)}
+        className="text-danger"
+        icon="minus-square"
+        size="2x"
+        title="Remove from Stash"
+      />
+    );
+  }
+
+  noStashIcon(id) {
+    return (
+      <FontAwesomeIcon
+        onClick={e => this.handleAddToStash(id, e)}
+        className="text-success"
+        icon="plus-square"
+        size="2x"
+        title="Add to Stash"
+      />
+    );
+  }
+
   render() {
     const { collection, pager } = this.props;
+    const { holdings, stashControl } = this.state;
 
     return (
       <Container>
@@ -86,7 +164,18 @@ export class Flavors extends Component {
                 value={this.state.limit}
               />
             </Col>
-            <Col className="text-right">
+            <Col className="text-center">
+              <Form>
+                <Form.Check
+                  name="stashControl"
+                  type="checkbox"
+                  id="flavorStash"
+                  label="&nbsp;Enable Flavor Stash"
+                  onChange={this.handleStashControl}
+                />
+              </Form>
+            </Col>
+            <Col xs={3} className="text-right">
               <select
                 value={this.state.page}
                 onChange={this.handlePageChange}
@@ -104,7 +193,7 @@ export class Flavors extends Component {
         <Table responsive striped bordered hover size="sm">
           <thead>
             <tr className="text-center">
-              <th>Stash</th>
+              {stashControl && <th>Stash</th>}
               <th>ID</th>
               <th>Vendor</th>
               <th>Name</th>
@@ -116,11 +205,14 @@ export class Flavors extends Component {
             {collection.map((flavor, index) => {
               return (
                 <tr key={index}>
-                  <td className="text-center">
-                    <Button>
-                      <FontAwesomeIcon icon="plus" />
-                    </Button>
-                  </td>
+                  {stashControl && (
+                    <td className="text-center">
+                      {holdings &&
+                        (holdings[flavor.id] === true
+                          ? this.inStashIcon(flavor.id)
+                          : this.noStashIcon(flavor.id))}
+                    </td>
+                  )}
                   <td className="text-center">{flavor.id}</td>
                   <td>{flavor.Vendor.name}</td>
                   <td>{flavor.name}</td>
@@ -171,11 +263,12 @@ export class Flavors extends Component {
 
 const mapStateToProps = state => ({
   collection: getAllFlavors(state),
-  pager: getFlavorsPager(state)
+  pager: getFlavorsPager(state),
+  stash: getStash(state)
 });
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(flavorsActions, dispatch)
+  actions: bindActionCreators({ ...flavorActions, ...flavorsActions }, dispatch)
 });
 
 export default connect(
