@@ -4,9 +4,12 @@ export const types = buildActions('flavor', [
   'REQUEST_STASH',
   'REQUEST_STASH_SUCCESS',
   'REQUEST_STASH_FAILURE',
-  'ADD_STASH',
-  'ADD_STASH_SUCCESS',
-  'ADD_STASH_FAILURE'
+  'ADD_TO_STASH',
+  'ADD_TO_STASH_SUCCESS',
+  'ADD_TO_STASH_FAILURE',
+  'REMOVE_FROM_STASH',
+  'REMOVE_FROM_STASH_SUCCESS',
+  'REMOVE_FROM_STASH_FAILURE'
 ]);
 
 const requestStash = () => ({
@@ -24,16 +27,30 @@ const requestStashFailure = error => ({
 });
 
 const addStash = flavor => ({
-  type: types.ADD_STASH,
+  type: types.ADD_TO_STASH,
   flavor
 });
 
 const addStashSuccess = () => ({
-  type: types.ADD_STASH_SUCCESS
+  type: types.ADD_TO_STASH_SUCCESS
 });
 
 const addStashFailure = error => ({
-  type: types.ADD_STASH_FAILURE,
+  type: types.ADD_TO_STASH_FAILURE,
+  error
+});
+
+const removeStash = flavor => ({
+  type: types.REMOVE_FROM_STASH,
+  flavor
+});
+
+const removeStashSuccess = () => ({
+  type: types.REMOVE_FROM_STASH_SUCCESS
+});
+
+const removeStashFailure = error => ({
+  type: types.REMOVE_FROM_STASH_FAILURE,
   error
 });
 
@@ -43,7 +60,10 @@ export const actions = {
   requestStashFailure,
   addStash,
   addStashSuccess,
-  addStashFailure
+  addStashFailure,
+  removeStash,
+  removeStashSuccess,
+  removeStashFailure
 };
 
 export const initialState = {
@@ -65,12 +85,22 @@ export const reducer = (state = initialState, action = {}) => {
         ...state,
         error: action.error
       };
-    case types.ADD_STASH_SUCCESS:
+    case types.ADD_TO_STASH_SUCCESS:
       return {
         ...state,
         loaded: false
       };
-    case types.ADD_STASH_FAILURE:
+    case types.ADD_TO_STASH_FAILURE:
+      return {
+        ...state,
+        error: action.error
+      };
+    case types.REMOVE_FROM_STASH_SUCCESS:
+      return {
+        ...state,
+        loaded: false
+      };
+    case types.REMOVE_FROM_STASH_FAILURE:
       return {
         ...state,
         error: action.error
