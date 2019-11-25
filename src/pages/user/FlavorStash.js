@@ -16,26 +16,39 @@ import {
 } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { actions as flavorActions } from 'reducers/flavor';
+import { actions as noteActions } from 'reducers/note';
+import { getFlavorNote } from 'selectors/note';
 import { getStash } from 'selectors/flavor';
 
 export class FlavorStash extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    stash: PropTypes.array
+    stash: PropTypes.array,
+    note: PropTypes.array
   };
 
   constructor(props) {
     super(props);
     const { actions } = this.props;
 
-    this.state = { editting: false, removed: [], usage: [] };
+    this.state = {
+      editingStash: false,
+      editingNote: false,
+      notes: [],
+      removed: [],
+      usage: [],
+      viewingNote: []
+    };
 
     actions.requestStash();
 
     this.handleRemoveFromStash = this.removeFromStash.bind(this);
     this.handleAddToStash = this.addToStash.bind(this);
-    this.handleEditor = this.handleEditor.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleStashEditor = this.handleStashEditor.bind(this);
+    this.handleNoteEditor = this.handleNoteEditor.bind(this);
+    this.handleNoteViewer = this.handleNoteViewer.bind(this);
+    this.handleStashSubmit = this.handleStashSubmit.bind(this);
+    this.handleNoteSubmit = this.handleNoteSubmit.bind(this);
   }
 
   date(d) {
@@ -63,7 +76,7 @@ export class FlavorStash extends Component {
   }
 
   inStashIcon(id) {
-    const { editting } = this.state;
+    const { editingStash } = this.state;
 
     return (
       <Fragment>
@@ -74,9 +87,9 @@ export class FlavorStash extends Component {
           size="2x"
           title="Remove from Stash"
         />{' '}
-        {!editting && (
+        {!editingStash && (
           <FontAwesomeIcon
-            onClick={e => this.handleEditor(id, e)}
+            onClick={e => this.handleStashEditor(id, e)}
             className="text-info"
             icon="pen-square"
             size="2x"
@@ -99,15 +112,39 @@ export class FlavorStash extends Component {
     );
   }
 
-  handleEditor(id) {
+  noteIcon(id) {
+    return (
+      <FontAwesomeIcon
+        onClick={e => this.handleNoteViewer(id, e)}
+        className="text-primary"
+        icon="sticky-note"
+        size="2x"
+        title="Flavor Note"
+      />
+    );
+  }
+
+  notesIcon(id) {
+    return (
+      <FontAwesomeIcon
+        onClick={e => this.handleAddToStash(id, e)}
+        className="text-warning"
+        icon="book"
+        size="2x"
+        title="Flavor Notes"
+      />
+    );
+  }
+
+  handleStashEditor(id) {
     if (id) {
-      this.setState({ editting: id });
+      this.setState({ editingStash: id });
     } else {
-      this.setState({ editting: false });
+      this.setState({ editingStash: false });
     }
   }
 
-  handleSubmit(values) {
+  handleStashSubmit(values) {
     const { actions } = this.props;
     const { flavorId, minMillipercent, maxMillipercent } = values;
 
@@ -119,7 +156,7 @@ export class FlavorStash extends Component {
       maxMillipercent
     };
     this.setState({
-      editting: false,
+      editingStash: false,
       ...usage
     });
   }
@@ -129,7 +166,7 @@ export class FlavorStash extends Component {
 
     return (
       <FinalForm
-        onSubmit={this.handleSubmit}
+        onSubmit={this.handleStashSubmit}
         initialValues={{
           flavorId,
           maxMillipercent: maxMillipercent / 1000,
@@ -189,7 +226,129 @@ export class FlavorStash extends Component {
                     <span>Save</span>
                   </Button>
                   <Button
-                    onClick={e => this.handleEditor(false, e)}
+                    onClick={e => this.handleStashEditor(false, e)}
+                    className="button-animation"
+                    variant="danger"
+                  >
+                    <span>Cancel</span>
+                  </Button>
+                </ButtonGroup>
+              </Form.Group>
+            </Form.Row>
+          </Form>
+        )}
+      />
+    );
+  }
+
+  handleNoteViewer(id) {
+    const viewingNote = this.state.viewingNote;
+
+    if (id) {
+      const { actions } = this.props;
+
+      actions.requestNote(id);
+      viewingNote[id] = true;
+    } else {
+      viewingNote[id] = false;
+    }
+    this.setState({ ...viewingNote });
+    // eslint-disable-next-line no-console
+    console.log(this.state.viewingNote[id]);
+  }
+
+  noteViewer(id) {
+    const { note } = this.props;
+
+    if (!note.user[id]) {
+      return <div>No note exists for this flavor!</div>;
+    }
+  }
+
+  handleNoteEditor(id) {
+    if (id) {
+      this.setState({ editingNote: id });
+    } else {
+      this.setState({ editingNote: false });
+    }
+  }
+
+  handleNoteSubmit(values) {
+    const { actions } = this.props;
+    const { flavorId, note, update } = values;
+
+    if (update === true) {
+      actions.updateStash(values);
+    }
+    const notes = this.state.notes;
+
+    notes[flavorId] = {
+      note
+    };
+    this.setState({
+      editingNote: false,
+      ...notes
+    });
+  }
+
+  noteEditor(flavor) {
+    const { flavorId, userId } = flavor;
+
+    const collection = this.props.note;
+
+    let note = '';
+
+    if (!collection.user[flavorId]) {
+      note = collection.user[flavorId].note;
+    }
+
+    return (
+      <FinalForm
+        onSubmit={this.handleSubmit}
+        initialValues={{
+          flavorId,
+          note,
+          userId
+        }}
+        render={({ handleSubmit, submitting }) => (
+          <Form
+            noValidate
+            onSubmit={handleSubmit}
+            initialValues={{ flavorId, note, userId }}
+          >
+            <h3>Flavor Note:</h3>
+            <Form.Row>
+              <Field name="note">
+                {({ input }) => (
+                  <Form.Group as={Col}>
+                    <InputGroup>
+                      <Form.Control
+                        {...input}
+                        as="textarea"
+                        placeholder="Flavor Note"
+                        style={{ 'min-height': '500px' }}
+                      />
+                    </InputGroup>
+                  </Form.Group>
+                )}
+              </Field>
+              <Field name="flavorId">
+                {({ input }) => <Form.Control {...input} type="hidden" />}
+              </Field>
+            </Form.Row>
+            <Form.Row>
+              <Form.Group>
+                <ButtonGroup>
+                  <Button
+                    className="button-animation"
+                    variant="primary"
+                    type="submit"
+                    disabled={submitting}
+                  >
+                    <span>Save</span>
+                  </Button>
+                  <Button
+                    onClick={e => this.handleNoteEditor(false, e)}
                     className="button-animation"
                     variant="danger"
                   >
@@ -206,7 +365,13 @@ export class FlavorStash extends Component {
 
   render() {
     const { stash } = this.props;
-    const { editting, removed, usage } = this.state;
+    const {
+      editingStash,
+      editingNote,
+      removed,
+      usage,
+      viewingNote
+    } = this.state;
 
     return (
       <Container>
@@ -244,15 +409,23 @@ export class FlavorStash extends Component {
                         : `${minMillipercent} - ${maxMillipercent}`}
                       %
                     </Card.Text>
-                    {editting === flavor.flavorId
+                    {editingStash === flavor.flavorId
                       ? this.stashEditor(flavor)
+                      : ''}
+                    {editingNote === flavor.flavorId
+                      ? this.noteEditor(flavor)
+                      : ''}
+                    {viewingNote[flavor.flavorId]
+                      ? this.noteViewer(flavor.flavorId)
                       : ''}
                   </Card.Body>
                   <Card.Footer>
                     <span className="float-left">
                       {!removed[flavor.flavorId]
                         ? this.inStashIcon(flavor.flavorId)
-                        : this.noStashIcon(flavor.flavorId)}
+                        : this.noStashIcon(flavor.flavorId)}{' '}
+                      {this.noteIcon(flavor.flavorId)}{' '}
+                      {this.notesIcon(flavor.flavorId)}
                     </span>
                     <span className="float-right">ID: {flavor.flavorId}</span>
                   </Card.Footer>
@@ -267,11 +440,18 @@ export class FlavorStash extends Component {
 }
 
 const mapStateToProps = state => ({
-  stash: getStash(state)
+  stash: getStash(state),
+  note: getFlavorNote(state)
 });
 
 const mapDispatchToProps = dispatch => ({
-  actions: bindActionCreators(flavorActions, dispatch)
+  actions: bindActionCreators(
+    {
+      ...flavorActions,
+      ...noteActions
+    },
+    dispatch
+  )
 });
 
 export default connect(
