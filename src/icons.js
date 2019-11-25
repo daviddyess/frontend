@@ -1,6 +1,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faBezierCurve,
+  faBook,
   faCheck,
   faChevronLeft,
   faClock,
@@ -17,6 +18,7 @@ import {
   faTimes,
   faTimesCircle,
   faStar as fasStar,
+  faStickyNote,
   faSync,
   faUser,
   faUsers,
@@ -35,6 +37,7 @@ import {
 
 library.add(
   faBezierCurve,
+  faBook,
   faCheck,
   faCheckSquare,
   faChevronLeft,
@@ -55,6 +58,7 @@ library.add(
   fasStar,
   farStar,
   faSquare,
+  faStickyNote,
   faSync,
   faTachometerAlt,
   faTimes,
