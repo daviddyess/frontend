@@ -30,9 +30,9 @@ const requestNoteFailure = error => ({
   error
 });
 
-const createNote = note => ({
+const createNote = flavorNote => ({
   type: types.CREATE_NOTE,
-  note
+  flavorNote
 });
 
 const createNoteSuccess = () => ({
@@ -44,9 +44,9 @@ const createNoteFailure = error => ({
   error
 });
 
-const deleteNote = note => ({
+const deleteNote = flavorNote => ({
   type: types.DELETE_NOTE,
-  note
+  flavorNote
 });
 
 const deleteNoteSuccess = () => ({
@@ -58,9 +58,9 @@ const deleteNoteFailure = error => ({
   error
 });
 
-const updateNote = note => ({
+const updateNote = flavorNote => ({
   type: types.UPDATE_NOTE,
-  note
+  flavorNote
 });
 
 const updateNoteSuccess = () => ({
@@ -90,7 +90,7 @@ export const actions = {
 export const initialState = {
   loaded: false,
   error: null,
-  collection: { user: [] }
+  collection: {}
 };
 
 export const reducer = (state = initialState, action = {}) => {
@@ -107,8 +107,7 @@ export const reducer = (state = initialState, action = {}) => {
       };
     case types.CREATE_NOTE_SUCCESS:
       return {
-        ...state,
-        loaded: false
+        ...state
       };
     case types.CREATE_NOTE_FAILURE:
       return {

@@ -10,10 +10,11 @@ import { actions as toastActions } from 'reducers/toast';
 function* requestNoteWorker({ note }) {
   try {
     const { flavorId } = note;
+
     const collection = yield select(getFlavorNote);
 
-    if (collection.user[flavorId]) {
-      return true;
+    if (collection[flavorId]) {
+      return yield put(actions.requestNoteSuccess(collection));
     }
 
     let userId = null;
@@ -42,17 +43,18 @@ function* requestNoteWorker({ note }) {
     const result = yield call(request.execute, { endpoint });
 
     if (result.success) {
-      const { data } = result.response;
-
-      collection.user[flavorId] = false;
+      const {
+        response: { data }
+      } = result;
 
       if (!data) {
+        collection[flavorId] = false;
         return yield put(actions.requestNoteSuccess(collection));
       }
 
-      collection.user[flavorId] = data;
+      collection[flavorId] = data[0];
 
-      yield put(actions.requestNoteSuccess(collection));
+      return yield put(actions.requestNoteSuccess(collection));
     } else if (result.error) {
       throw result.error;
     } else {
@@ -65,7 +67,7 @@ function* requestNoteWorker({ note }) {
   }
 }
 
-function* createNoteWorker({ flavor }) {
+function* createNoteWorker({ flavorNote }) {
   try {
     let user = yield select(getUser);
 
@@ -78,14 +80,20 @@ function* createNoteWorker({ flavor }) {
       user = yield select(getUser);
     }
 
+    // eslint-disable-next-line no-console
+    console.log(JSON.stringify(flavorNote));
+
     const endpoint = {
-      url: `/user/${user.id}/flavor`,
+      url: `/user/${user.id}/note`,
       method: 'POST'
     };
 
+    const { flavorId, note } = flavorNote;
+
     const data = {
       userId: user.id,
-      flavorId: flavor.id
+      flavorId,
+      note
     };
 
     const result = yield call(request.execute, { endpoint, data });
@@ -94,15 +102,15 @@ function* createNoteWorker({ flavor }) {
       yield put(actions.createNoteSuccess());
       yield put(
         toastActions.popToast({
-          title: 'Note Update',
+          title: 'Note',
           icon: 'times-circle',
-          message: `Flavor ID ${flavor.id} successfully created!`
+          message: `Flavor ID ${flavorId} Note successfully created!`
         })
       );
     } else if (result.error) {
       throw result.error;
     } else {
-      throw new Error(`Failed to create Flavor ID ${flavor.id} to the Note!`);
+      throw new Error(`Failed to create Flavor ID ${flavorId} Note!`);
     }
   } catch (error) {
     const { message } = error;
@@ -121,7 +129,7 @@ function* createNoteWorker({ flavor }) {
   }
 }
 
-function* deleteNoteWorker({ flavor }) {
+function* deleteNoteWorker({ flavorNote }) {
   try {
     let user = yield select(getUser);
 
@@ -135,7 +143,7 @@ function* deleteNoteWorker({ flavor }) {
     }
 
     const endpoint = {
-      url: `/user/${user.id}/flavor/${flavor.id}`,
+      url: `/user/${user.id}/flavor/${flavorNote.id}`,
       method: 'DELETE'
     };
 
@@ -147,13 +155,15 @@ function* deleteNoteWorker({ flavor }) {
         toastActions.popToast({
           title: 'Note Update',
           icon: 'times-circle',
-          message: `Flavor ID ${flavor.id} successfully deleted!`
+          message: `Flavor ID ${flavorNote.id} successfully deleted!`
         })
       );
     } else if (result.error) {
       throw result.error;
     } else {
-      throw new Error(`Failed to delete Flavor ID ${flavor.id} from the Note!`);
+      throw new Error(
+        `Failed to delete Flavor ID ${flavorNote.id} from the Note!`
+      );
     }
   } catch (error) {
     const { message } = error;
@@ -172,7 +182,7 @@ function* deleteNoteWorker({ flavor }) {
   }
 }
 
-function* updateNoteWorker({ flavor }) {
+function* updateNoteWorker({ flavorNote }) {
   try {
     let user = yield select(getUser);
 
@@ -185,14 +195,17 @@ function* updateNoteWorker({ flavor }) {
       user = yield select(getUser);
     }
 
-    const endpoint = {
-      url: `/user/${user.id}/flavor/${flavor.flavorId}`,
-      method: 'PUT'
-    };
+    const { flavorId, note } = flavorNote;
 
     const data = {
-      minMillipercent: flavor.minMillipercent * 1000,
-      maxMillipercent: flavor.maxMillipercent * 1000
+      userId: user.id,
+      flavorId,
+      note
+    };
+
+    const endpoint = {
+      url: `/user/${user.id}/note/${flavorId}`,
+      method: 'PUT'
     };
 
     const result = yield call(request.execute, { endpoint, data });
@@ -203,13 +216,13 @@ function* updateNoteWorker({ flavor }) {
         toastActions.popToast({
           title: 'Note Update',
           icon: 'times-circle',
-          message: `Flavor ID ${flavor.flavorId} successfully updated!`
+          message: `Flavor ID ${flavorId} Note successfully updated!`
         })
       );
     } else if (result.error) {
       throw result.error;
     } else {
-      throw new Error(`Failed to update Note Flavor ID ${flavor.flavorId}!`);
+      throw new Error(`Failed to update Note Flavor ID ${flavorId}!`);
     }
   } catch (error) {
     const { message } = error;
