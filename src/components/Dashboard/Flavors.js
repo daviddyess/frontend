@@ -1,7 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { Table } from 'react-bootstrap';
-import { DashboardLayout as Layout } from 'components/Dashboard/';
+import {
+  DashboardLink as DashLink,
+  DashboardLayout as Layout
+} from 'components/Dashboard/';
 import { PagerInfo, withPagination } from 'components/Pagination';
 import { actions as flavorsActions } from 'reducers/flavors';
 import { getAllFlavors, getFlavorsPager } from 'selectors/flavors';
@@ -32,6 +35,7 @@ export class Flavors extends Component {
               <th>Name</th>
               <th>Slug</th>
               <th>Density</th>
+              <th>Options</th>
             </tr>
           </thead>
           <tbody>
@@ -43,6 +47,15 @@ export class Flavors extends Component {
                   <td>{flavor.name}</td>
                   <td className="text-center">{flavor.slug}</td>
                   <td className="text-center">{flavor.density}</td>
+                  <td>
+                    <DashLink
+                      to={`#flavor/edit/${flavor.id}`}
+                      name="Flavor/Edit"
+                      item={Number(flavor.id)}
+                    >
+                      Edit
+                    </DashLink>
+                  </td>
                 </tr>
               );
             })}
