@@ -75,6 +75,12 @@ export class Menu extends Component {
                   Flavors
                 </DashLink>
               </div>
+              <div>
+                <FontAwesomeIcon icon="plus" /> &nbsp;
+                <DashLink to="#flavors/add" name="Flavor/Add">
+                  Add Flavor
+                </DashLink>
+              </div>
             </Card.Body>
           </Accordion.Collapse>
         </Card>
