@@ -16,3 +16,8 @@ export const getFlavorsPager = createSelector(
   getFlavors,
   flavors => flavors.pager
 );
+
+export const getFlavor = createSelector(
+  getFlavors,
+  flavors => flavors.flavor
+);

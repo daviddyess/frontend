@@ -1,8 +1,51 @@
 import { all, call, put, takeLatest, select } from 'redux-saga/effects';
 import request from 'utils/request';
-import { getCachedFlavors, getFlavorsPager } from 'selectors/flavors';
+import {
+  getFlavor,
+  getCachedFlavors,
+  getFlavorsPager
+} from 'selectors/flavors';
 import { actions, types } from 'reducers/flavors';
 import { actions as toastActions } from 'reducers/toast';
+
+function* requestFlavorWorker({ flavorId }) {
+  try {
+    const flavor = yield select(getFlavor);
+
+    if (flavor.length === 0 || flavor.flavorId !== flavorId) {
+      const endpoint = {
+        url: `/flavor/${flavorId}`,
+        method: 'GET'
+      };
+      const result = yield call(request.execute, { endpoint });
+
+      if (result.success) {
+        const {
+          response: { data }
+        } = result;
+
+        // eslint-disable-next-line no-console
+        console.log(data);
+        yield put(actions.requestFlavorSuccess(data));
+      } else if (result.error) {
+        throw result.error;
+      } else {
+        throw new Error('Failed to get flavor!');
+      }
+    }
+  } catch (error) {
+    const { message } = error;
+
+    yield put(actions.requestFailure(error));
+    yield put(
+      toastActions.popToast({
+        title: 'Error',
+        icon: 'times-circle',
+        message
+      })
+    );
+  }
+}
 
 function* requestFlavorsWorker({ pager }) {
   try {
@@ -90,7 +133,7 @@ function* requestFlavorsWorker({ pager }) {
   } catch (error) {
     const { message } = error;
 
-    yield put(actions.requestFlavorsFailure(error));
+    yield put(actions.requestFailure(error));
     yield put(
       toastActions.popToast({
         title: 'Error',
@@ -101,15 +144,21 @@ function* requestFlavorsWorker({ pager }) {
   }
 }
 
+function* requestFlavorWatcher() {
+  yield takeLatest(types.REQUEST_FLAVOR, requestFlavorWorker);
+}
+
 function* requestFlavorsWatcher() {
   yield takeLatest(types.REQUEST_FLAVORS, requestFlavorsWorker);
 }
 
 export const workers = {
+  requestFlavorWorker,
   requestFlavorsWorker
 };
 
 export const watchers = {
+  requestFlavorWatcher,
   requestFlavorsWatcher
 };
 
