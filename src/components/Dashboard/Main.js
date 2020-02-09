@@ -4,6 +4,8 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import {
   Flavors,
+  FlavorAdd,
+  FlavorEdit,
   DashboardHome as Home,
   Migrations,
   DashboardNotFound as NotFound,
@@ -41,6 +43,12 @@ class DashboardMain extends Component {
         return <Home />;
       case 'Flavors':
         return <Flavors layoutOptions={defaultLayoutOptions} />;
+      case 'Flavor/Add':
+        return <FlavorAdd layoutOptions={defaultLayoutOptions} />;
+      case 'Flavor/Edit':
+        return (
+          <FlavorEdit layoutOptions={defaultLayoutOptions} flavorId={item} />
+        );
       case 'Migrations':
         return <Migrations layoutOptions={defaultLayoutOptions} />;
       case 'Roles':
