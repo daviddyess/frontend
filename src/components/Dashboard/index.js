@@ -6,6 +6,8 @@ export DashboardMain from './Main';
 export DashboardNotFound from './NotFound';
 
 export Flavors from './Flavors';
+export FlavorAdd from './Flavor/Add';
+export FlavorEdit from './Flavor/Edit';
 export DashboardHome from './Home';
 export Migrations from './Migrations';
 export Roles from './Roles';
