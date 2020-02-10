@@ -11,6 +11,7 @@ import { reducer as flavors, initialState as flavorsState } from './flavors';
 import { reducer as roles, initialState as rolesState } from './roles';
 import { reducer as toast, initialState as toastState } from './toast';
 import { reducer as users, initialState as usersState } from './users';
+import { reducer as vendors, initialState as vendorsState } from './vendors';
 
 export const initialState = {
   application: applicationState,
@@ -18,7 +19,8 @@ export const initialState = {
   flavors: flavorsState,
   roles: rolesState,
   toast: toastState,
-  users: usersState
+  users: usersState,
+  vendors: vendorsState
 };
 
 export default combineReducers({
@@ -27,5 +29,6 @@ export default combineReducers({
   flavors,
   roles,
   toast,
-  users
+  users,
+  vendors
 });

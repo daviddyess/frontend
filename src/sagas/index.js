@@ -6,7 +6,10 @@ import flavors from './flavors';
 import roles from './roles';
 import toast from './toast';
 import users from './users';
+import vendors from './vendors';
 
 export default function* saga() {
-  yield all([application, dashboard, flavors, roles, toast, users].map(fork));
+  yield all(
+    [application, dashboard, flavors, roles, toast, users, vendors].map(fork)
+  );
 }
