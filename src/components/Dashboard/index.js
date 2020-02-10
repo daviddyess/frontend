@@ -7,6 +7,9 @@ export DashboardNotFound from './NotFound';
 
 export Flavors from './Flavors';
 export DashboardHome from './Home';
+export Diluents from './Diluents';
+export DiluentAdd from './Diluent/Add';
+export DiluentEdit from './Diluent/Edit';
 export Migrations from './Migrations';
 export Roles from './Roles';
 export RoleAdd from './Role/Add';

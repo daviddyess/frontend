@@ -3,6 +3,9 @@ import { connect } from 'react-redux';
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import {
+  Diluents,
+  DiluentAdd,
+  DiluentEdit,
   Flavors,
   DashboardHome as Home,
   Migrations,
@@ -39,6 +42,14 @@ class DashboardMain extends Component {
     switch (name) {
       case 'Home':
         return <Home />;
+      case 'Diluents':
+        return <Diluents layoutOptions={defaultLayoutOptions} />;
+      case 'Diluent/Add':
+        return <DiluentAdd layoutOptions={defaultLayoutOptions} />;
+      case 'Diluent/Edit':
+        return (
+          <DiluentEdit layoutOptions={defaultLayoutOptions} diluentId={item} />
+        );
       case 'Flavors':
         return <Flavors layoutOptions={defaultLayoutOptions} />;
       case 'Migrations':
