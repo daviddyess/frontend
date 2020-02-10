@@ -15,7 +15,10 @@ import {
   RoleAddUser,
   RoleDeleteUser,
   Users,
-  UserRoles
+  UserRoles,
+  Vendors,
+  VendorAdd,
+  VendorEdit
 } from 'components/Dashboard/';
 
 import { actions as dashboardActions } from 'reducers/dashboard';
@@ -92,6 +95,14 @@ class DashboardMain extends Component {
         return <Users layoutOptions={defaultLayoutOptions} />;
       case 'User/Roles':
         return <UserRoles layoutOptions={defaultLayoutOptions} userId={item} />;
+      case 'Vendors':
+        return <Vendors layoutOptions={defaultLayoutOptions} />;
+      case 'Vendor/Add':
+        return <VendorAdd layoutOptions={defaultLayoutOptions} />;
+      case 'Vendor/Edit':
+        return (
+          <VendorEdit layoutOptions={defaultLayoutOptions} vendorId={item} />
+        );
       default:
         return <NotFound layoutOptions={defaultLayoutOptions} name={name} />;
     }

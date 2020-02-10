@@ -1,6 +1,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faBezierCurve,
+  faBoxes,
   faCheck,
   faChevronLeft,
   faClock,
@@ -27,6 +28,7 @@ import {
 } from '@fortawesome/free-regular-svg-icons';
 
 library.add(
+  faBoxes,
   faBezierCurve,
   faCheck,
   faCheckSquare,
