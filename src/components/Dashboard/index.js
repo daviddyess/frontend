@@ -7,6 +7,7 @@ export DashboardNotFound from './NotFound';
 
 export Flavors from './Flavors';
 export DashboardHome from './Home';
+export Ingredients from './Ingredients';
 export Migrations from './Migrations';
 export Roles from './Roles';
 export RoleAdd from './Role/Add';

@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import { DashboardLink as DashLink } from 'components/Dashboard/';
 import { Accordion, Card } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -81,10 +81,56 @@ export class Menu extends Component {
         <Card>
           <Accordion.Toggle as={Card.Header} eventKey="3">
             <h3>
-              <FontAwesomeIcon icon="database" /> Database
+              <FontAwesomeIcon icon="skull-crossbones" /> Safety
             </h3>
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="3">
+            <Fragment>
+              <Card.Body className="border-bottom">
+                <div>
+                  <FontAwesomeIcon icon="sitemap" /> &nbsp;
+                  <DashLink
+                    to="#flavor-safety/categories"
+                    name="Ingredients/Categories"
+                  >
+                    Categories
+                  </DashLink>
+                </div>
+                <div>
+                  <FontAwesomeIcon icon="plus" /> &nbsp;
+                  <DashLink
+                    to="#flavor-safety/categories/add"
+                    name="Ingredient/Category/Add"
+                  >
+                    Add Category
+                  </DashLink>
+                </div>
+              </Card.Body>
+
+              <Card.Body>
+                <div>
+                  <FontAwesomeIcon icon="puzzle-piece" /> &nbsp;
+                  <DashLink to="#flavor-safety" name="Ingredients">
+                    Ingredients
+                  </DashLink>
+                </div>
+                <div>
+                  <FontAwesomeIcon icon="plus" /> &nbsp;
+                  <DashLink to="#flavor-safety/add" name="Ingredient/Add">
+                    Add Ingredient
+                  </DashLink>
+                </div>
+              </Card.Body>
+            </Fragment>
+          </Accordion.Collapse>
+        </Card>
+        <Card>
+          <Accordion.Toggle as={Card.Header} eventKey="4">
+            <h3>
+              <FontAwesomeIcon icon="database" /> Database
+            </h3>
+          </Accordion.Toggle>
+          <Accordion.Collapse eventKey="4">
             <Card.Body>
               <FontAwesomeIcon icon="clock" /> &nbsp;
               <DashLink to="#migrations" name="Migrations">
