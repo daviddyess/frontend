@@ -4,14 +4,24 @@ import application from './application';
 import dashboard from './dashboard';
 import flavors from './flavors';
 import ingredients from './ingredients';
+import ingredientCategory from './ingredientCategory';
+import ingredientCategories from './ingredientCategories';
 import roles from './roles';
 import toast from './toast';
 import users from './users';
 
 export default function* saga() {
   yield all(
-    [application, dashboard, flavors, ingredients, roles, toast, users].map(
-      fork
-    )
+    [
+      application,
+      dashboard,
+      flavors,
+      ingredients,
+      ingredientCategory,
+      ingredientCategories,
+      roles,
+      toast,
+      users
+    ].map(fork)
   );
 }
