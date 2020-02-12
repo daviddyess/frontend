@@ -1,22 +1,10 @@
 import { buildActions } from 'utils';
 
 export const types = buildActions('vendors', [
-  'REQUEST_VENDOR',
-  'REQUEST_VENDOR_SUCCESS',
   'REQUEST_VENDORS',
   'REQUEST_VENDORS_SUCCESS',
   'REQUEST_FAILURE'
 ]);
-
-const requestVendor = vendorId => ({
-  type: types.REQUEST_VENDOR,
-  vendorId
-});
-
-const requestVendorSuccess = vendor => ({
-  type: types.REQUEST_VENDOR_SUCCESS,
-  vendor
-});
 
 const requestVendors = pager => ({
   type: types.REQUEST_VENDORS,
@@ -35,15 +23,12 @@ const requestFailure = error => ({
 });
 
 export const actions = {
-  requestVendor,
-  requestVendorSuccess,
   requestVendors,
   requestVendorsSuccess,
   requestFailure
 };
 
 export const initialState = {
-  vendor: {},
   cache: [],
   collection: [],
   pager: {
@@ -56,11 +41,6 @@ export const initialState = {
 
 export const reducer = (state = initialState, action = {}) => {
   switch (action.type) {
-    case types.REQUEST_VENDOR_SUCCESS:
-      return {
-        ...state,
-        vendor: action.vendor
-      };
     case types.REQUEST_VENDORS_SUCCESS:
       return {
         ...state,

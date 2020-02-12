@@ -1,51 +1,8 @@
 import { all, call, put, takeLatest, select } from 'redux-saga/effects';
 import request from 'utils/request';
-import {
-  getVendor,
-  getCachedVendors,
-  getVendorsPager
-} from 'selectors/vendors';
+import { getCachedVendors, getVendorsPager } from 'selectors/vendors';
 import { actions, types } from 'reducers/vendors';
 import { actions as toastActions } from 'reducers/toast';
-
-function* requestVendorWorker({ vendorId }) {
-  try {
-    const vendor = yield select(getVendor);
-
-    if (vendor.length === 0 || vendor.vendorId !== vendorId) {
-      const endpoint = {
-        url: `/vendor/${vendorId}`,
-        method: 'GET'
-      };
-      const result = yield call(request.execute, { endpoint });
-
-      if (result.success) {
-        const {
-          response: { data }
-        } = result;
-
-        // eslint-disable-next-line no-console
-        console.log(data);
-        yield put(actions.requestVendorSuccess(data));
-      } else if (result.error) {
-        throw result.error;
-      } else {
-        throw new Error('Failed to get vendor!');
-      }
-    }
-  } catch (error) {
-    const { message } = error;
-
-    yield put(actions.requestFailure(error));
-    yield put(
-      toastActions.popToast({
-        title: 'Error',
-        icon: 'times-circle',
-        message
-      })
-    );
-  }
-}
 
 function* requestVendorsWorker({ pager }) {
   try {
@@ -144,21 +101,15 @@ function* requestVendorsWorker({ pager }) {
   }
 }
 
-function* requestVendorWatcher() {
-  yield takeLatest(types.REQUEST_VENDOR, requestVendorWorker);
-}
-
 function* requestVendorsWatcher() {
   yield takeLatest(types.REQUEST_VENDORS, requestVendorsWorker);
 }
 
 export const workers = {
-  requestVendorWorker,
   requestVendorsWorker
 };
 
 export const watchers = {
-  requestVendorWatcher,
   requestVendorsWatcher
 };
 

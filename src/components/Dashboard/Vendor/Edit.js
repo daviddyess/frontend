@@ -10,9 +10,9 @@ import {
 } from 'components/Dashboard/';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { actions as vendorsActions } from 'reducers/vendors';
+import { actions as vendorActions } from 'reducers/vendor';
 import { actions as dashActions } from 'reducers/dashboard';
-import { getVendor } from 'selectors/vendors';
+import { getVendor } from 'selectors/vendor';
 
 export class VendorEdit extends Component {
   static propTypes = {
@@ -156,7 +156,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(
     {
-      ...vendorsActions,
+      ...vendorActions,
       ...dashActions
     },
     dispatch

@@ -16,8 +16,3 @@ export const getVendorsPager = createSelector(
   getVendors,
   vendors => vendors.pager
 );
-
-export const getVendor = createSelector(
-  getVendors,
-  vendors => vendors.vendor
-);
