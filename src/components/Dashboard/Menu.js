@@ -91,7 +91,7 @@ export class Menu extends Component {
                   <FontAwesomeIcon icon="sitemap" /> &nbsp;
                   <DashLink
                     to="#flavor-safety/categories"
-                    name="Ingredients/Categories"
+                    name="Ingredient/Categories"
                   >
                     Categories
                   </DashLink>

@@ -1,7 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { Component, Fragment } from 'react';
 import { Table } from 'react-bootstrap';
-import { DashboardLayout as Layout } from 'components/Dashboard/';
+import {
+  DashboardLink as DashLink,
+  DashboardLayout as Layout
+} from 'components/Dashboard/';
 import { PagerInfo, withPagination } from 'components/Pagination';
 import { actions as ingredientsActions } from 'reducers/ingredients';
 import { getAllIngredients, getIngredientsPager } from 'selectors/ingredients';
@@ -13,10 +16,6 @@ export class Ingredients extends Component {
     pager: PropTypes.object.isRequired,
     pagerNavigation: PropTypes.node.isRequired
   };
-
-  date(timestamp) {
-    return new Date(timestamp).toString;
-  }
 
   render() {
     const { collection, layoutOptions, pager, pagerNavigation } = this.props;
@@ -35,15 +34,14 @@ export class Ingredients extends Component {
               <th>Name</th>
               <th>CAS</th>
               <th>Category</th>
-              <th>Created</th>
-              <th>Updated</th>
+              <th>Options</th>
             </tr>
           </thead>
           <tbody>
             {collection.map((ingredient, index) => {
               return (
                 <Fragment key={index}>
-                  <tr key={index}>
+                  <tr>
                     <td className="text-center">{ingredient.id}</td>
                     <td>{ingredient.name}</td>
                     <td className="text-center">{ingredient.casNumber}</td>
@@ -52,8 +50,15 @@ export class Ingredients extends Component {
                         ? ingredient.IngredientCategory.name
                         : 'None'}
                     </td>
-                    <td className="text-center">{ingredient.created}</td>
-                    <td className="text-center">{ingredient.updated}</td>
+                    <td className="text-center">
+                      <DashLink
+                        to={`#flavor-safety/edit/${ingredient.id}`}
+                        name="Ingredient/Edit"
+                        item={ingredient.id}
+                      >
+                        Edit
+                      </DashLink>
+                    </td>
                   </tr>
                   {ingredient.notes ? (
                     <tr key={`notes-${index}`}>

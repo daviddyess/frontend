@@ -6,6 +6,11 @@ import {
   Flavors,
   DashboardHome as Home,
   Ingredients,
+  IngredientAdd,
+  IngredientEdit,
+  IngredientCategories,
+  IngredientCategoryAdd,
+  IngredientCategoryEdit,
   Migrations,
   DashboardNotFound as NotFound,
   Roles,
@@ -44,6 +49,26 @@ class DashboardMain extends Component {
         return <Flavors layoutOptions={defaultLayoutOptions} />;
       case 'Ingredients':
         return <Ingredients layoutOptions={defaultLayoutOptions} />;
+      case 'Ingredient/Add':
+        return <IngredientAdd layoutOptions={defaultLayoutOptions} />;
+      case 'Ingredient/Edit':
+        return (
+          <IngredientEdit
+            layoutOptions={defaultLayoutOptions}
+            ingredientId={item}
+          />
+        );
+      case 'Ingredient/Categories':
+        return <IngredientCategories layoutOptions={defaultLayoutOptions} />;
+      case 'Ingredient/Category/Add':
+        return <IngredientCategoryAdd layoutOptions={defaultLayoutOptions} />;
+      case 'Ingredient/Category/Edit':
+        return (
+          <IngredientCategoryEdit
+            layoutOptions={defaultLayoutOptions}
+            ingredientCategoryId={item}
+          />
+        );
       case 'Migrations':
         return <Migrations layoutOptions={defaultLayoutOptions} />;
       case 'Roles':
