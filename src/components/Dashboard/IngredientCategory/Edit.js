@@ -3,26 +3,23 @@ import { connect } from 'react-redux';
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { Form as FinalForm, Field } from 'react-final-form';
-import { Alert, Button, Col, Form } from 'react-bootstrap';
+import { Button, Col, Form } from 'react-bootstrap';
 import {
   DashboardLink as DashLink,
   DashboardLayout as Layout
 } from 'components/Dashboard/';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { actions as ingredientsActions } from 'reducers/ingredients';
-import { actions as ingredientCategoriesActions } from 'reducers/ingredientCategories';
+import { actions as ingredientCategoryActions } from 'reducers/ingredientCategory';
 import { actions as dashActions } from 'reducers/dashboard';
-import { getIngredient } from 'selectors/ingredients';
-import { getAllIngredientCategories } from 'selectors/ingredientCategories';
+import { getCategory } from 'selectors/ingredientCategory';
 
-export class IngredientEdit extends Component {
+export class IngredientCategoryEdit extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
-    ingredient: PropTypes.object.isRequired,
-    ingredientCategories: PropTypes.array.isRequired,
+    ingredientCategory: PropTypes.object.isRequired,
     layoutOptions: PropTypes.object.isRequired,
-    ingredientId: PropTypes.number.isRequired
+    ingredientCategoryId: PropTypes.number.isRequired
   };
 
   constructor(props) {
@@ -30,57 +27,53 @@ export class IngredientEdit extends Component {
 
     this.handleSubmit = this.handleSubmit.bind(this);
 
-    const { actions, ingredientId } = this.props;
+    const { actions, ingredientCategoryId } = this.props;
 
-    actions.requestIngredient(ingredientId);
-    actions.requestIngredientCategories({ limit: 100, page: 1 });
+    actions.requestIngredientCategory(ingredientCategoryId);
   }
 
-  handleSubmit({ name, casNumber, ingredientCategoryId, notes }) {
-    const { actions, ingredientId } = this.props;
+  handleSubmit({ name, ordinal, description }) {
+    const { actions, ingredientCategoryId } = this.props;
 
     actions.updateIngredient({
-      ingredientId,
-      name,
-      casNumber,
       ingredientCategoryId,
-      notes
+      name,
+      ordinal,
+      description
     });
     actions.selectDashboard({ name: 'Safety' });
   }
 
   render() {
     const {
-      ingredient,
-      ingredientCategories,
-      ingredientId,
+      ingredientCategory,
+      ingredientCategoryId,
       layoutOptions
     } = this.props;
-    const { id, name, casNumber, ingredientCategoryId, notes } = ingredient;
+    const { id, name, ordinal, description } = ingredientCategory;
 
     return (
       <Layout
-        pageTitle="Edit Ingredient - Dashboard"
+        pageTitle="Edit Ingredient Category - Dashboard"
         header={
-          ingredient.name
-            ? `Flavor Safety > Ingredient Editor > ${ingredient.name}`
-            : `Flavor Safety > Ingredient Editor > ${ingredientId}`
+          ingredientCategory.name
+            ? `Flavor Safety > Category Editor > ${ingredientCategory.name}`
+            : `Flavor Safety > Category Editor > ${ingredientCategoryId}`
         }
         options={layoutOptions}
       >
         <FontAwesomeIcon icon="chevron-left" /> &nbsp;
-        <DashLink to="#flavor-safety" name="Ingredients">
+        <DashLink to="#flavor-safety/categories" name="Ingredient/Categories">
           <span>Back</span>
         </DashLink>
-        {ingredient.id ? (
+        {ingredientCategory.id ? (
           <FinalForm
             onSubmit={this.handleSubmit}
             initialValues={{
               id,
               name,
-              casNumber,
-              ingredientCategoryId,
-              notes
+              ordinal,
+              description
             }}
             render={({ handleSubmit, submitting, values }) => (
               <Form noValidate onSubmit={handleSubmit}>
@@ -104,15 +97,16 @@ export class IngredientEdit extends Component {
                       </Form.Group>
                     )}
                   </Field>
-                </Form.Row>
-                <Form.Row>
-                  <Field name="casNumber" required="true">
+                  <Field name="ordinal" required="true">
                     {({ input, meta }) => (
-                      <Form.Group as={Col} controlId="formGridCasNumber">
-                        <Form.Label>CAS</Form.Label>
+                      <Form.Group as={Col} controlId="formGridOrdinal">
+                        <Form.Label>Ordinal</Form.Label>
                         <Form.Control
                           {...input}
-                          type="text"
+                          type="number"
+                          min="0"
+                          max="99"
+                          step="1"
                           isInvalid={meta.error}
                         >
                           {meta.error && (
@@ -126,48 +120,16 @@ export class IngredientEdit extends Component {
                       </Form.Group>
                     )}
                   </Field>
-                  <Field name="ingredientCategoryId" required="true">
-                    {({ input, meta }) => (
-                      <Form.Group as={Col} controlId="formGridCategory">
-                        <Form.Label>Category</Form.Label>
-                        <Form.Control {...input} as="select">
-                          {ingredientCategories.map((category, index) => {
-                            return (
-                              <option value={category.id} key={index}>
-                                {category.name}
-                              </option>
-                            );
-                          })}
-                          {meta.error && (
-                            <Form.Control.Feedback type="invalid">
-                              {meta.error === 'required'
-                                ? 'This field is required'
-                                : ''}
-                            </Form.Control.Feedback>
-                          )}
-                        </Form.Control>
-                      </Form.Group>
-                    )}
-                  </Field>
                 </Form.Row>
-                {values.ingredientCategoryId
-                  ? ingredientCategories.map(category => {
-                      if (category.id === Number(values.ingredientCategoryId)) {
-                        return (
-                          <Alert variant="info">{category.description}</Alert>
-                        );
-                      }
-                    })
-                  : null}
                 <Form.Row>
-                  <Field name="notes" required="false">
+                  <Field name="description" required="true">
                     {({ input, meta }) => (
-                      <Form.Group as={Col} controlId="formGridNotes">
-                        <Form.Label>Notes</Form.Label>
+                      <Form.Group as={Col} controlId="formGridDescription">
+                        <Form.Label>Description</Form.Label>
                         <Form.Control
                           {...input}
                           as="textarea"
-                          rows="4"
+                          rows="2"
                           isInvalid={meta.error}
                         >
                           {meta.error && (
@@ -191,7 +153,6 @@ export class IngredientEdit extends Component {
                   <span>Save</span>
                 </Button>
                 <pre>{JSON.stringify(values, 0, 2)}</pre>
-                <pre>{JSON.stringify(ingredientCategories, 0, 2)}</pre>
               </Form>
             )}
           />
@@ -202,15 +163,13 @@ export class IngredientEdit extends Component {
 }
 
 const mapStateToProps = state => ({
-  ingredient: getIngredient(state),
-  ingredientCategories: getAllIngredientCategories(state)
+  ingredientCategory: getCategory(state)
 });
 
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(
     {
-      ...ingredientsActions,
-      ...ingredientCategoriesActions,
+      ...ingredientCategoryActions,
       ...dashActions
     },
     dispatch
@@ -220,4 +179,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(IngredientEdit);
+)(IngredientCategoryEdit);
