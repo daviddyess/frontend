@@ -6,8 +6,6 @@ export DashboardMain from './Main';
 export DashboardNotFound from './NotFound';
 
 export DataSuppliers from './DataSuppliers';
-export DataSupplierAdd from './DataSupplier/Add';
-export DataSupplierEdit from './DataSupplier/Edit';
 export Flavors from './Flavors';
 export DashboardHome from './Home';
 export Migrations from './Migrations';

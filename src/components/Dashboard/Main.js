@@ -4,8 +4,6 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import {
   DataSuppliers,
-  DataSupplierAdd,
-  DataSupplierEdit,
   Flavors,
   DashboardHome as Home,
   Migrations,
@@ -44,15 +42,6 @@ class DashboardMain extends Component {
         return <Home />;
       case 'DataSuppliers':
         return <DataSuppliers layoutOptions={defaultLayoutOptions} />;
-      case 'DataSupplier/Add':
-        return <DataSupplierAdd layoutOptions={defaultLayoutOptions} />;
-      case 'DataSupplier/Edit':
-        return (
-          <DataSupplierEdit
-            layoutOptions={defaultLayoutOptions}
-            dataSupplierId={item}
-          />
-        );
       case 'Flavors':
         return <Flavors layoutOptions={defaultLayoutOptions} />;
       case 'Migrations':
