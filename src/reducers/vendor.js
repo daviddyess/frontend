@@ -3,6 +3,7 @@ import { buildActions } from 'utils';
 export const types = buildActions('vendor', [
   'REQUEST_VENDOR',
   'REQUEST_VENDOR_SUCCESS',
+  'CREATE_ROLE',
   'REQUEST_FAILURE'
 ]);
 
@@ -16,6 +17,11 @@ const requestVendorSuccess = vendor => ({
   vendor
 });
 
+const createVendor = ({ name }) => ({
+  type: types.CREATE_VENDOR,
+  name
+});
+
 const requestFailure = error => ({
   type: types.REQUEST_FAILURE,
   error
@@ -24,10 +30,12 @@ const requestFailure = error => ({
 export const actions = {
   requestVendor,
   requestVendorSuccess,
+  createVendor,
   requestFailure
 };
 
 export const initialState = {
+  error: null,
   collection: {}
 };
 
