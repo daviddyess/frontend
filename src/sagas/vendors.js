@@ -27,7 +27,7 @@ function* requestVendorsWorker({ pager }) {
         } = vendorsCount;
         // Set pager to be passed into Success, Update count
 
-        pager.count = data;
+        pager.count = data.vendors;
       } else if (vendorsCount.error) {
         throw vendorsCount.error;
       } else {
