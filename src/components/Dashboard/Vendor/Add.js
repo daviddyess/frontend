@@ -10,7 +10,7 @@ import {
 } from 'components/Dashboard/';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import { actions as vendorsActions } from 'reducers/vendors';
+import { actions as vendorActions } from 'reducers/vendor';
 import { actions as dashActions } from 'reducers/dashboard';
 
 export class VendorAdd extends Component {
@@ -132,7 +132,7 @@ export class VendorAdd extends Component {
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(
     {
-      ...vendorsActions,
+      ...vendorActions,
       ...dashActions
     },
     dispatch

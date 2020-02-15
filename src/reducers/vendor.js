@@ -3,7 +3,9 @@ import { buildActions } from 'utils';
 export const types = buildActions('vendor', [
   'REQUEST_VENDOR',
   'REQUEST_VENDOR_SUCCESS',
-  'CREATE_ROLE',
+  'CREATE_VENDOR',
+  'DELETE_VENDOR',
+  'UPDATE_VENDOR',
   'REQUEST_FAILURE'
 ]);
 
@@ -17,9 +19,20 @@ const requestVendorSuccess = vendor => ({
   vendor
 });
 
-const createVendor = ({ name }) => ({
+const createVendor = details => ({
   type: types.CREATE_VENDOR,
+  details
+});
+
+const deleteVendor = ({ vendorId, name }) => ({
+  type: types.DELETE_VENDOR,
+  vendorId,
   name
+});
+
+const updateVendor = details => ({
+  type: types.UPDATE_VENDOR,
+  details
 });
 
 const requestFailure = error => ({
@@ -31,6 +44,8 @@ export const actions = {
   requestVendor,
   requestVendorSuccess,
   createVendor,
+  deleteVendor,
+  updateVendor,
   requestFailure
 };
 

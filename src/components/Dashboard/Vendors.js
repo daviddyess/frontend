@@ -14,7 +14,7 @@ export class Vendors extends Component {
     layoutOptions: PropTypes.object.isRequired,
     collection: PropTypes.array.isRequired,
     pager: PropTypes.object.isRequired,
-    pagerNavigation: PropTypes.node.isRequired
+    pagerNavigation: PropTypes.node
   };
 
   render() {
@@ -52,6 +52,14 @@ export class Vendors extends Component {
                       item={vendor.id}
                     >
                       Edit
+                    </DashLink>
+                    &nbsp; | &nbsp;
+                    <DashLink
+                      to={`#vendor/delete/${vendor.id}`}
+                      name="Vendor/Delete"
+                      item={{ vendorId: vendor.id, name: vendor.name }}
+                    >
+                      Delete
                     </DashLink>
                   </td>
                 </tr>

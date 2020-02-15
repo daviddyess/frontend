@@ -18,7 +18,8 @@ import {
   UserRoles,
   Vendors,
   VendorAdd,
-  VendorEdit
+  VendorEdit,
+  VendorDelete
 } from 'components/Dashboard/';
 
 import { actions as dashboardActions } from 'reducers/dashboard';
@@ -102,6 +103,14 @@ class DashboardMain extends Component {
       case 'Vendor/Edit':
         return (
           <VendorEdit layoutOptions={defaultLayoutOptions} vendorId={item} />
+        );
+      case 'Vendor/Delete':
+        return (
+          <VendorDelete
+            layoutOptions={defaultLayoutOptions}
+            vendorId={item.vendorId}
+            name={item.name}
+          />
         );
       default:
         return <NotFound layoutOptions={defaultLayoutOptions} name={name} />;

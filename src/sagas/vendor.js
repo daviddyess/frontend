@@ -43,20 +43,20 @@ function* requestVendorWorker({ vendorId }) {
   }
 }
 
-function* createVendorWorker({ name }) {
+function* createVendorWorker({ details: { name, slug, code } }) {
   try {
     const endpoint = {
       url: '/vendor',
       method: 'POST'
     };
     const data = {
-      name
+      name,
+      slug,
+      code
     };
     const result = yield call(request.execute, { endpoint, data });
 
     if (result.success) {
-      yield put(actions.clearCollection());
-      yield put(actions.requestVendors({ page: 1, limit: 20 }));
       yield put(
         toastActions.popToast({
           title: 'Vendor Created',
@@ -83,6 +83,83 @@ function* createVendorWorker({ name }) {
   }
 }
 
+function* updateVendorWorker({ details: { vendorId, name, slug, code } }) {
+  try {
+    const endpoint = {
+      url: `/vendor/${vendorId}`,
+      method: 'PUT'
+    };
+    const data = {
+      name,
+      slug,
+      code
+    };
+    const result = yield call(request.execute, { endpoint, data });
+
+    // update vendors in state or throw an error
+    if (result.success) {
+      yield put(
+        toastActions.popToast({
+          title: 'Edit Vendor',
+          icon: 'times-circle',
+          message: `${name} vendor successfully updated!`
+        })
+      );
+    } else if (result.error) {
+      throw result.error;
+    } else {
+      throw new Error('Failed to update vendor!');
+    }
+  } catch (error) {
+    const { message } = error;
+
+    yield put(actions.requestFailure(error));
+    yield put(
+      toastActions.popToast({
+        title: 'Error',
+        icon: 'times-circle',
+        message
+      })
+    );
+  }
+}
+
+function* deleteVendorWorker({ vendorId, name }) {
+  try {
+    const endpoint = {
+      url: `/vendor/${vendorId}`,
+      method: 'DELETE'
+    };
+    const result = yield call(request.execute, { endpoint });
+
+    // update vendors in state or throw an error
+    if (result.success) {
+      yield put(
+        toastActions.popToast({
+          title: 'Delete Vendor',
+          icon: 'times-circle',
+          message: `${name} vendor successfully deleted!`
+        })
+      );
+    } else if (result.error) {
+      throw result.error;
+    } else {
+      throw new Error('Failed to delete vendor!');
+    }
+  } catch (error) {
+    const { message } = error;
+
+    yield put(actions.requestFailure(error));
+    yield put(
+      toastActions.popToast({
+        title: 'Error',
+        icon: 'times-circle',
+        message
+      })
+    );
+  }
+}
+
 function* requestVendorWatcher() {
   yield takeLatest(types.REQUEST_VENDOR, requestVendorWorker);
 }
@@ -91,14 +168,26 @@ function* createVendorWatcher() {
   yield takeLatest(types.CREATE_VENDOR, createVendorWorker);
 }
 
+function* updateVendorWatcher() {
+  yield takeLatest(types.UPDATE_VENDOR, updateVendorWorker);
+}
+
+function* deleteVendorWatcher() {
+  yield takeLatest(types.DELETE_VENDOR, deleteVendorWorker);
+}
+
 export const workers = {
   requestVendorWorker,
-  createVendorWorker
+  createVendorWorker,
+  updateVendorWorker,
+  deleteVendorWorker
 };
 
 export const watchers = {
   requestVendorWatcher,
-  createVendorWatcher
+  createVendorWatcher,
+  updateVendorWatcher,
+  deleteVendorWatcher
 };
 
 export default function* saga() {
