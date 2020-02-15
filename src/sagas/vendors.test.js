@@ -1,25 +1,25 @@
 import { all, put, call, select } from 'redux-saga/effects';
 
 import request from 'utils/request';
-import { actions } from 'reducers/roles';
+import { actions } from 'reducers/vendors';
 import { actions as toastActions } from 'reducers/toast';
-import saga, { watchers, workers } from './roles';
-import { getCachedRoles, getRolesPager } from 'selectors/roles';
+import saga, { watchers, workers } from './vendors';
+import { getCachedVendors, getVendorsPager } from 'selectors/vendors';
 
-describe('roles sagas', () => {
-  const roles = { roles: true };
+describe('vendors sagas', () => {
+  const vendors = { vendors: true };
 
-  const rolesEndpoint = {
-    url: '/roles/?limit=20&offset=1',
+  const vendorsEndpoint = {
+    url: '/vendors/?limit=20&offset=1',
     method: 'GET'
   };
   const countEndpoint = {
-    url: '/roles/count',
+    url: '/vendors/count',
     method: 'GET'
   };
   /*
-  const createRoleEndpoint = {
-    url: '/role',
+  const createVendorEndpoint = {
+    url: '/vendor',
     method: 'POST'
   };
   */
@@ -33,12 +33,12 @@ describe('roles sagas', () => {
     pages: 2
   };
 
-  it('handles success in requestRolesWorker', () => {
-    const gen = workers.requestRolesWorker({ pager });
+  it('handles success in requestVendorsWorker', () => {
+    const gen = workers.requestVendorsWorker({ pager });
 
     let result = gen.next(pager);
 
-    expect(result.value).toEqual(select(getRolesPager));
+    expect(result.value).toEqual(select(getVendorsPager));
 
     result = gen.next(count);
 
@@ -53,33 +53,33 @@ describe('roles sagas', () => {
       }
     });
 
-    expect(result.value).toEqual(select(getCachedRoles));
+    expect(result.value).toEqual(select(getCachedVendors));
 
-    result = gen.next(roles);
+    result = gen.next(vendors);
 
     expect(result.value).toEqual(
-      call(request.execute, { endpoint: rolesEndpoint })
+      call(request.execute, { endpoint: vendorsEndpoint })
     );
 
     result = gen.next({
       success: true,
       response: {
-        data: roles
+        data: vendors
       }
     });
 
     expect(result.value).toEqual(
-      put(actions.requestRolesSuccess(roles, pager))
+      put(actions.requestVendorsSuccess(vendors, pager))
     );
   });
 
-  it('handles request failure in requestRolesWorker', () => {
+  it('handles request failure in requestVendorsWorker', () => {
     const error = new Error('An error occurred.');
-    const gen = workers.requestRolesWorker({ pager });
+    const gen = workers.requestVendorsWorker({ pager });
 
     let result = gen.next(pager);
 
-    expect(result.value).toEqual(select(getRolesPager));
+    expect(result.value).toEqual(select(getVendorsPager));
 
     result = gen.next(count);
 
@@ -94,12 +94,12 @@ describe('roles sagas', () => {
       }
     });
 
-    expect(result.value).toEqual(select(getCachedRoles));
+    expect(result.value).toEqual(select(getCachedVendors));
 
-    result = gen.next(roles);
+    result = gen.next(vendors);
 
     expect(result.value).toEqual(
-      call(request.execute, { endpoint: rolesEndpoint })
+      call(request.execute, { endpoint: vendorsEndpoint })
     );
 
     result = gen.next({
@@ -107,17 +107,17 @@ describe('roles sagas', () => {
       error
     });
 
-    expect(result.value).toEqual(put(actions.requestRolesFailure(error)));
+    expect(result.value).toEqual(put(actions.requestFailure(error)));
   });
 
-  it('handles unexpected error in requestRolesWorker', () => {
+  it('handles unexpected error in requestVendorsWorker', () => {
     const error = new Error('An error occurred.');
     const { message } = error;
-    const gen = workers.requestRolesWorker({ pager });
+    const gen = workers.requestVendorsWorker({ pager });
 
     let result = gen.next(pager);
 
-    expect(result.value).toEqual(select(getRolesPager));
+    expect(result.value).toEqual(select(getVendorsPager));
 
     result = gen.next(count);
 
@@ -132,12 +132,12 @@ describe('roles sagas', () => {
       }
     });
 
-    expect(result.value).toEqual(select(getCachedRoles));
+    expect(result.value).toEqual(select(getCachedVendors));
 
-    result = gen.next(roles);
+    result = gen.next(vendors);
 
     expect(result.value).toEqual(
-      call(request.execute, { endpoint: rolesEndpoint })
+      call(request.execute, { endpoint: vendorsEndpoint })
     );
 
     result = gen.next({
@@ -145,503 +145,7 @@ describe('roles sagas', () => {
       error
     });
 
-    expect(result.value).toEqual(put(actions.requestRolesFailure(error)));
-
-    result = gen.next();
-
-    expect(result.value).toEqual(
-      put(
-        toastActions.popToast({
-          title: 'Error',
-          icon: 'times-circle',
-          message
-        })
-      )
-    );
-  });
-
-  const name = 'luser';
-
-  const createEndpoint = {
-    url: '/role',
-    method: 'POST'
-  };
-
-  it('handles success in createRoleWorker', () => {
-    const gen = workers.createRoleWorker({ name });
-
-    let result = gen.next(name);
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: createEndpoint, data: { name } })
-    );
-
-    result = gen.next({
-      success: true,
-      response: {
-        data: name
-      }
-    });
-
-    expect(result.value).toEqual(
-      put(actions.clearCollection()),
-      put(actions.requestRoles({ page: 1, limit: 20 })),
-      put(
-        toastActions.popToast({
-          title: 'Role Created',
-          icon: 'times-circle',
-          message: `${name} role successfully created!`
-        })
-      )
-    );
-  });
-
-  it('handles request failure in createRoleWorker', () => {
-    const error = new Error('An error occurred.');
-    const gen = workers.createRoleWorker({ name });
-
-    let result = gen.next();
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: createEndpoint, data: { name } })
-    );
-
-    result = gen.next({
-      success: false,
-      error
-    });
-
-    expect(result.value).toEqual(put(actions.createRoleFailure(error)));
-  });
-
-  it('handles unexpected error in createRoleWorker', () => {
-    const error = new Error('An error occurred.');
-    const { message } = error;
-    const gen = workers.createRoleWorker({ name });
-
-    let result = gen.next();
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: createEndpoint, data: { name } })
-    );
-
-    result = gen.next({
-      success: false,
-      error
-    });
-
-    expect(result.value).toEqual(put(actions.createRoleFailure(error)));
-
-    result = gen.next();
-
-    expect(result.value).toEqual(
-      put(
-        toastActions.popToast({
-          title: 'Error',
-          icon: 'times-circle',
-          message
-        })
-      )
-    );
-  });
-
-  const roleId = 3;
-
-  const updateEndpoint = {
-    url: `/role/${roleId}`,
-    method: 'PUT'
-  };
-
-  it('handles success in updateRoleWorker', () => {
-    const gen = workers.updateRoleWorker({ roleId, name });
-
-    let result = gen.next(roleId, name);
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: updateEndpoint, data: { name } })
-    );
-
-    result = gen.next({
-      success: true
-    });
-
-    expect(result.value).toEqual(
-      put(actions.clearCollection()),
-      put(actions.requestRoles({ page: 1, limit: 20 })),
-      put(
-        toastActions.popToast({
-          title: 'Delete Role',
-          icon: 'times-circle',
-          message: `${name} role successfully updated!`
-        })
-      )
-    );
-  });
-
-  it('handles request failure in updateRoleWorker', () => {
-    const error = new Error('An error occurred.');
-    const gen = workers.updateRoleWorker({ roleId, name });
-
-    let result = gen.next();
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: updateEndpoint, data: { name } })
-    );
-
-    result = gen.next({
-      success: false,
-      error
-    });
-
-    expect(result.value).toEqual(put(actions.updateRoleFailure(error)));
-  });
-
-  it('handles unexpected error in updateRoleWorker', () => {
-    const error = new Error('An error occurred.');
-    const { message } = error;
-    const gen = workers.updateRoleWorker({ roleId, name });
-
-    let result = gen.next();
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: updateEndpoint, data: { name } })
-    );
-
-    result = gen.next({
-      success: false,
-      error
-    });
-
-    expect(result.value).toEqual(put(actions.updateRoleFailure(error)));
-
-    result = gen.next();
-
-    expect(result.value).toEqual(
-      put(
-        toastActions.popToast({
-          title: 'Error',
-          icon: 'times-circle',
-          message
-        })
-      )
-    );
-  });
-
-  const deleteEndpoint = {
-    url: `/role/${roleId}`,
-    method: 'DELETE'
-  };
-
-  it('handles success in deleteRoleWorker', () => {
-    const gen = workers.deleteRoleWorker({ roleId, name });
-
-    let result = gen.next(roleId, name);
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: deleteEndpoint })
-    );
-
-    result = gen.next({
-      success: true
-    });
-
-    expect(result.value).toEqual(
-      put(actions.clearCollection()),
-      put(actions.requestRoles({ page: 1, limit: 20 })),
-      put(
-        toastActions.popToast({
-          title: 'Delete Role',
-          icon: 'times-circle',
-          message: `${name} role successfully deleted!`
-        })
-      )
-    );
-  });
-
-  it('handles request failure in deleteRoleWorker', () => {
-    const error = new Error('An error occurred.');
-    const gen = workers.deleteRoleWorker({ roleId, name });
-
-    let result = gen.next();
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: deleteEndpoint })
-    );
-
-    result = gen.next({
-      success: false,
-      error
-    });
-
-    expect(result.value).toEqual(put(actions.deleteRoleFailure(error)));
-  });
-
-  it('handles unexpected error in deleteRoleWorker', () => {
-    const error = new Error('An error occurred.');
-    const { message } = error;
-    const gen = workers.deleteRoleWorker({ roleId, name });
-
-    let result = gen.next();
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: deleteEndpoint })
-    );
-
-    result = gen.next({
-      success: false,
-      error
-    });
-
-    expect(result.value).toEqual(put(actions.deleteRoleFailure(error)));
-
-    result = gen.next();
-
-    expect(result.value).toEqual(
-      put(
-        toastActions.popToast({
-          title: 'Error',
-          icon: 'times-circle',
-          message
-        })
-      )
-    );
-  });
-
-  const roleUsersEndpoint = {
-    url: `/users/role/${roleId}`,
-    method: 'GET'
-  };
-
-  const roleUsers = [true];
-
-  it('handles success in requestRoleUsersWorker', () => {
-    const gen = workers.requestRoleUsersWorker({ roleId });
-
-    let result = gen.next();
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: roleUsersEndpoint })
-    );
-
-    result = gen.next({
-      success: true,
-      response: {
-        data: roleUsers
-      }
-    });
-
-    expect(result.value).toEqual(
-      put(actions.requestRoleUsersSuccess(roleUsers))
-    );
-  });
-
-  it('handles request failure in requestRoleUsersWorker', () => {
-    const error = new Error('An error occurred.');
-    const gen = workers.requestRoleUsersWorker({ roleId });
-
-    let result = gen.next();
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: roleUsersEndpoint })
-    );
-
-    result = gen.next({
-      success: false,
-      error
-    });
-
-    expect(result.value).toEqual(put(actions.requestRoleUsersFailure(error)));
-  });
-
-  it('handles unexpected error in requestRoleUsersWorker', () => {
-    const error = new Error('An error occurred.');
-    const { message } = error;
-    const gen = workers.requestRoleUsersWorker({ roleId });
-
-    let result = gen.next();
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: roleUsersEndpoint })
-    );
-
-    result = gen.next({
-      success: false,
-      error
-    });
-
-    expect(result.value).toEqual(put(actions.requestRoleUsersFailure(error)));
-
-    result = gen.next();
-
-    expect(result.value).toEqual(
-      put(
-        toastActions.popToast({
-          title: 'Error',
-          icon: 'times-circle',
-          message
-        })
-      )
-    );
-  });
-
-  const userId = 20;
-
-  const createRoleUserEndpoint = {
-    url: `/user/${userId}/role`,
-    method: 'POST'
-  };
-
-  const active = true;
-
-  it('handles success in createRoleUserWorker', () => {
-    const gen = workers.createRoleUserWorker({ userId, roleId, active });
-
-    let result = gen.next(userId, roleId, active);
-
-    expect(result.value).toEqual(
-      call(request.execute, {
-        endpoint: createRoleUserEndpoint,
-        data: { userId, roleId, active }
-      })
-    );
-
-    result = gen.next({
-      success: true,
-      response: {
-        data: { userId, roleId, active }
-      }
-    });
-
-    expect(result.value).toEqual(
-      put(
-        toastActions.popToast({
-          title: 'User Role Added',
-          icon: 'times-circle',
-          message: `Role ${roleId} assigned to User ${userId}!`
-        })
-      )
-    );
-  });
-
-  it('handles request failure in createRoleUserWorker', () => {
-    const error = new Error('An error occurred.');
-    const gen = workers.createRoleUserWorker({ userId, roleId, active });
-
-    let result = gen.next();
-
-    expect(result.value).toEqual(
-      call(request.execute, {
-        endpoint: createRoleUserEndpoint,
-        data: { userId, roleId, active }
-      })
-    );
-
-    result = gen.next({
-      success: false,
-      error
-    });
-
-    expect(result.value).toEqual(put(actions.createRoleUserFailure(error)));
-  });
-
-  it('handles unexpected error in createRoleUserWorker', () => {
-    const error = new Error('An error occurred.');
-    const { message } = error;
-    const gen = workers.createRoleUserWorker({ userId, roleId, active });
-
-    let result = gen.next();
-
-    expect(result.value).toEqual(
-      call(request.execute, {
-        endpoint: createRoleUserEndpoint,
-        data: { userId, roleId, active }
-      })
-    );
-
-    result = gen.next({
-      success: false,
-      error
-    });
-
-    expect(result.value).toEqual(put(actions.createRoleUserFailure(error)));
-
-    result = gen.next();
-
-    expect(result.value).toEqual(
-      put(
-        toastActions.popToast({
-          title: 'Error',
-          icon: 'times-circle',
-          message
-        })
-      )
-    );
-  });
-
-  const deleteRoleUserEndpoint = {
-    url: `/user/${userId}/role/${roleId}`,
-    method: 'DELETE'
-  };
-
-  it('handles success in deleteRoleUserWorker', () => {
-    const gen = workers.deleteRoleUserWorker({ userId, roleId, name });
-
-    let result = gen.next(userId, roleId, name);
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: deleteRoleUserEndpoint })
-    );
-
-    result = gen.next({
-      success: true
-    });
-
-    expect(result.value).toEqual(
-      put(
-        toastActions.popToast({
-          title: 'Unassign User Role',
-          icon: 'times-circle',
-          message: `${name} role successfully unassigned!`
-        })
-      )
-    );
-  });
-
-  it('handles request failure in deleteRoleUserWorker', () => {
-    const error = new Error('An error occurred.');
-    const gen = workers.deleteRoleUserWorker({ userId, roleId, name });
-
-    let result = gen.next();
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: deleteRoleUserEndpoint })
-    );
-
-    result = gen.next({
-      success: false,
-      error
-    });
-
-    expect(result.value).toEqual(put(actions.deleteRoleUserFailure(error)));
-  });
-
-  it('handles unexpected error in deleteRoleUserWorker', () => {
-    const error = new Error('An error occurred.');
-    const { message } = error;
-    const gen = workers.deleteRoleUserWorker({ userId, roleId, name });
-
-    let result = gen.next();
-
-    expect(result.value).toEqual(
-      call(request.execute, { endpoint: deleteRoleUserEndpoint })
-    );
-
-    result = gen.next({
-      success: false,
-      error
-    });
-
-    expect(result.value).toEqual(put(actions.deleteRoleUserFailure(error)));
+    expect(result.value).toEqual(put(actions.requestFailure(error)));
 
     result = gen.next();
 
