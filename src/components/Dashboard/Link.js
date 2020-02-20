@@ -24,10 +24,7 @@ export class DashboardLink extends Component {
   select(name, item = null) {
     const { actions } = this.props;
 
-    actions.selectDashboard({
-      name,
-      item
-    });
+    actions.selectDashboard({ name, item });
   }
 
   render() {
@@ -55,7 +52,4 @@ const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(dashboardActions, dispatch)
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(DashboardLink);
+export default connect(mapStateToProps, mapDispatchToProps)(DashboardLink);

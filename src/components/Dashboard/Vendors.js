@@ -5,7 +5,7 @@ import {
   DashboardLink as DashLink,
   DashboardLayout as Layout
 } from 'components/Dashboard/';
-import { PagerInfo, withPagination } from 'components/Pagination';
+import { PagerInfo, withPagination } from 'components/Pagination/Pagination';
 import { actions as vendorsActions } from 'reducers/vendors';
 import { getAllVendors, getVendorsPager } from 'selectors/vendors';
 
@@ -75,9 +75,7 @@ export class Vendors extends Component {
 }
 
 export default withPagination(
-  Vendors,
-  vendorsActions,
-  'requestVendors',
-  getVendorsPager,
-  getAllVendors
-);
+  vendorsActions.requestVendors,
+  getAllVendors,
+  getVendorsPager
+)(Vendors);

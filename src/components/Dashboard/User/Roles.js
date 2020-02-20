@@ -48,8 +48,9 @@ export class UserRoles extends Component {
         <DashLink to="#roles" name="Roles">
           Roles
         </DashLink>
-        {!roles && <Alert>No Roles Assigned to this User!</Alert>}
-        {roles && (
+        {!roles ? (
+          <Alert>No Roles Assigned to this User!</Alert>
+        ) : (
           <Table responsive striped bordered hover size="sm">
             <thead>
               <tr className="text-center">
@@ -107,15 +108,10 @@ export class UserRoles extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  roles: getUserRoles(state)
-});
+const mapStateToProps = state => ({ roles: getUserRoles(state) });
 
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(usersActions, dispatch)
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(UserRoles);
+export default connect(mapStateToProps, mapDispatchToProps)(UserRoles);

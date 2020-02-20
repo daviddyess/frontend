@@ -12,13 +12,17 @@ import {
   faPlus,
   faTachometerAlt,
   faTimes,
+  faCity,
+  faGlobe,
+  faInfoCircle,
   faTimesCircle,
   faStar as fasStar,
   faSync,
   faUser,
   faUsers,
   faUsersCog,
-  faUserShield
+  faUserShield,
+  faUndo
 } from '@fortawesome/free-solid-svg-icons';
 import {
   faCheckSquare,
@@ -37,6 +41,10 @@ library.add(
   faDatabase,
   faEyeDropper,
   faFire,
+  faCity,
+  faGlobe,
+  faInfoCircle,
+  faTimesCircle,
   fasHeart,
   farHeart,
   faPlus,
@@ -50,7 +58,9 @@ library.add(
   faUser,
   faUsers,
   faUsersCog,
-  faUserShield
+  faUserShield,
+  faSquare,
+  faUndo
 );
 
 export default library;

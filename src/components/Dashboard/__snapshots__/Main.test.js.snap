@@ -1028,14 +1028,16 @@ exports[`Dashboard <Main /> renders Role/Add/User correctly 1`] = `
           <option
             value={1}
           >
-            user.UserProfile.name (
+            Andrew
+             (
             blah@blah.com
             )
           </option>
           <option
             value={2}
           >
-            user.UserProfile.name (
+            Josef
+             (
             blah2@blah.com
             )
           </option>
@@ -1247,9 +1249,8 @@ exports[`Dashboard <Main /> renders Role/Edit correctly 1`] = `
           onBlur={[Function]}
           onChange={[Function]}
           onFocus={[Function]}
-          placeholder="test"
           type="text"
-          value=""
+          value="test"
         />
       </div>
       <button
@@ -1955,7 +1956,7 @@ exports[`Dashboard <Main /> renders Users correctly 1`] = `
             <td
               className="text-center"
             >
-              user.UserProfile.name
+              Andrew
             </td>
             <td
               className="text-center"
@@ -1973,7 +1974,7 @@ exports[`Dashboard <Main /> renders Users correctly 1`] = `
               className="text-center"
             >
               <a
-                href="/user/profile"
+                href="/user/Andrew"
                 onClick={[Function]}
               >
                 Profile
@@ -1996,7 +1997,7 @@ exports[`Dashboard <Main /> renders Users correctly 1`] = `
             <td
               className="text-center"
             >
-              user.UserProfile.name
+              Josef
             </td>
             <td
               className="text-center"
@@ -2014,7 +2015,7 @@ exports[`Dashboard <Main /> renders Users correctly 1`] = `
               className="text-center"
             >
               <a
-                href="/user/profile"
+                href="/user/Josef"
                 onClick={[Function]}
               >
                 Profile

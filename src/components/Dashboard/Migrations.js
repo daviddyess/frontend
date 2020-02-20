@@ -60,15 +60,10 @@ export class Migrations extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  migrations: getMigrations(state)
-});
+const mapStateToProps = state => ({ migrations: getMigrations(state) });
 
 const mapDispatchToProps = dispatch => ({
   actions: bindActionCreators(dashboardActions, dispatch)
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Migrations);
+export default connect(mapStateToProps, mapDispatchToProps)(Migrations);

@@ -163,7 +163,4 @@ const mapDispatchToProps = dispatch => ({
   )
 });
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(VendorEdit);
+export default connect(mapStateToProps, mapDispatchToProps)(VendorEdit);

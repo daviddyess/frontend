@@ -7,7 +7,7 @@ import {
 } from 'components/Dashboard/';
 import { Table } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { PagerInfo, withPagination } from 'components/Pagination';
+import { PagerInfo, withPagination } from 'components/Pagination/Pagination';
 import { actions as usersActions } from 'reducers/users';
 import { getAllUsers, getUsersPager } from 'selectors/users';
 
@@ -52,13 +52,13 @@ export class Users extends Component {
               return (
                 <tr key={index}>
                   <td className="text-center">{user.id}</td>
-                  <td className="text-center">user.UserProfile.name</td>
+                  <td className="text-center">{user.UserProfile.name}</td>
                   <td className="text-center">{user.emailAddress}</td>
                   <td className="text-center">
                     {user.activationCode === null ? this.yesIcon : this.noIcon}
                   </td>
                   <td className="text-center">
-                    <Link to="/user/profile">Profile</Link>
+                    <Link to={`/user/${user.UserProfile.name}`}>Profile</Link>
                     &nbsp; | &nbsp;
                     <DashLink
                       to={`#user/${user.id}/roles`}
@@ -81,9 +81,7 @@ export class Users extends Component {
 }
 
 export default withPagination(
-  Users,
-  usersActions,
-  'requestUsers',
-  getUsersPager,
-  getAllUsers
-);
+  usersActions.requestUsers,
+  getAllUsers,
+  getUsersPager
+)(Users);
