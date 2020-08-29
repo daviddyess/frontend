@@ -12,6 +12,7 @@ import PrivateRoute from 'components/PrivateRoute/PrivateRoute';
 import ErrorBoundary from 'components/ErrorBoundary/ErrorBoundary';
 import { actions as appActions } from 'reducers/application';
 import {
+  Admin,
   Dashboard,
   Favorites,
   Flavors,
@@ -60,6 +61,7 @@ export class App extends Component {
             />
             <Route exact path="/flavors" component={Flavors} />
             <Route exact path="/recipe" component={Recipe} />
+            <PrivateRoute path="/admin" component={Admin} />
             <PrivateRoute exact path="/user/profile" component={Profile} />
             <PrivateRoute exact path="/user/recipes" component={UserRecipes} />
             <PrivateRoute exact path="/user/favorites" component={Favorites} />
