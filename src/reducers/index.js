@@ -7,6 +7,7 @@ import {
   reducer as dashboard,
   initialState as dashboardState
 } from './dashboard';
+import { reducer as editor, initialState as editorState } from './editor';
 import { reducer as flavor, initialState as flavorState } from './flavor';
 import { reducer as flavors, initialState as flavorsState } from './flavors';
 import { reducer as profile, initialState as profileState } from './profile';
@@ -18,6 +19,7 @@ import { reducer as users, initialState as usersState } from './users';
 export const initialState = {
   application: applicationState,
   dashboard: dashboardState,
+  editor: editorState,
   flavor: flavorState,
   flavors: flavorsState,
   profile: profileState,
@@ -30,6 +32,7 @@ export const initialState = {
 export default combineReducers({
   application,
   dashboard,
+  editor,
   flavor,
   flavors,
   profile,

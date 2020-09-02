@@ -1,9 +1,12 @@
 import PropTypes from 'prop-types';
-import React, { Fragment, useState } from 'react';
-import { useSelector } from 'react-redux';
+import React, { Fragment } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Breadcrumbs from 'components/Breadcrumbs/Breadcrumbs';
 import { Button, Col, Table } from 'react-bootstrap';
 import { PagerInfo, withPagination } from 'components/Pagination/Pagination';
+import { actions as editorActions } from 'reducers/editor';
 import { actions as rolesActions } from 'reducers/roles';
+import { getEditorStatus } from 'selectors/editor';
 import { getAllRoles, getRolesPager } from 'selectors/roles';
 import RoleEditor from 'components/Admin/Roles/Editor';
 
@@ -17,25 +20,42 @@ export default withPagination(
     pagerNavigation: PropTypes.node.isRequired
   };
   const collection = useSelector(getAllRoles);
+
+  const displayEditor = useSelector(getEditorStatus);
+
   const noEdit = (role) => {
     // Don't allow editing of Adminstrator or User roles
     return role === 'Administrator' || role === 'User' ? true : false;
   };
-  const [showEditor, setShowEditor] = useState({ id: null });
-  const [showUsers, setShowUsers] = useState({ id: null });
-  const [assignRole, setAssignRole] = useState({ id: null });
+  const dispatch = useDispatch();
   const handleRoleEditor = (id) => {
-    setShowEditor({ id });
+    dispatch(
+      editorActions.displayEditor({
+        editor: 'adminRole',
+        status: id
+      })
+    );
   };
   const handleRoleUsers = (id) => {
-    setShowUsers({ id });
+    dispatch(
+      editorActions.displayEditor({
+        editor: 'adminRoleUsers',
+        status: id
+      })
+    );
   };
   const handleAssignRole = (id) => {
-    setAssignRole({ id });
+    dispatch(
+      editorActions.displayEditor({
+        editor: 'adminRoleUser',
+        status: id
+      })
+    );
   };
 
   return (
     <Col>
+      <Breadcrumbs base="admin" active="Roles" />
       <h2>Roles</h2>
       {pagerNavigation}
       <Table responsive striped bordered hover size="sm">
@@ -54,35 +74,41 @@ export default withPagination(
                   <td className="text-center">{role.id}</td>
                   <td>{role.name}</td>
                   <td>
-                    <Button size="sm" onClick={() => handleRoleUsers(role.id)}>
+                    <Button
+                      onClick={() => handleRoleUsers(role.id)}
+                      className="mr-1"
+                    >
                       Users
                     </Button>
-                    <Button size="sm" onClick={() => handleAssignRole(role.id)}>
+                    <Button
+                      onClick={() => handleAssignRole(role.id)}
+                      className="mr-1"
+                    >
                       Assign
                     </Button>
                     {!noEdit(role.name) && (
                       <Button
-                        size="sm"
                         onClick={() => handleRoleEditor(role.id)}
+                        className="mr-1"
                       >
                         Edit
                       </Button>
                     )}
                   </td>
                 </tr>
-                {showEditor.id === role.id ? (
+                {displayEditor.adminRole === role.id ? (
                   <tr>
                     <td colSpan="3">
                       <RoleEditor role={role} />
                     </td>
                   </tr>
                 ) : null}
-                {showUsers.id === role.id ? (
+                {displayEditor.adminRoleUsers === role.id ? (
                   <tr>
                     <td colSpan="3">Users</td>
                   </tr>
                 ) : null}
-                {assignRole.id === role.id ? (
+                {displayEditor.adminRoleUser === role.id ? (
                   <tr>
                     <td colSpan="3">Assign Role</td>
                   </tr>

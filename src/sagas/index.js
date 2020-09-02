@@ -2,6 +2,7 @@ import { all, fork } from 'redux-saga/effects';
 
 import application from './application';
 import dashboard from './dashboard';
+import editor from './editor';
 import flavor from './flavor';
 import flavors from './flavors';
 import profile from './profile';
@@ -15,6 +16,7 @@ export default function* saga() {
     [
       application,
       dashboard,
+      editor,
       flavor,
       flavors,
       profile,

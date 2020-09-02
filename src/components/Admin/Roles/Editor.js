@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { Form as FinalForm, Field } from 'react-final-form';
 import { Button, Form } from 'react-bootstrap';
 import { actions as rolesActions } from 'reducers/roles';
-
+import { actions as editorActions } from 'reducers/editor';
 export default function RoleEditor({ role }) {
   RoleEditor.propTypes = {
     role: PropTypes.object
@@ -12,6 +12,14 @@ export default function RoleEditor({ role }) {
   const dispatch = useDispatch();
   const handleSubmit = ({ id, name }) => {
     dispatch(rolesActions.updateRole({ roleId: id, name }));
+  };
+  const closeEditor = () => {
+    dispatch(
+      editorActions.displayEditor({
+        editor: 'adminRole',
+        status: false
+      })
+    );
   };
   const { id, name } = role;
 
@@ -44,6 +52,13 @@ export default function RoleEditor({ role }) {
               disabled={submitting}
             >
               <span>Save</span>
+            </Button>
+            <Button
+              onClick={() => closeEditor()}
+              className="button-animation"
+              variant="danger"
+            >
+              <span>Cancel</span>
             </Button>
           </Form>
         )}
