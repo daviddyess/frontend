@@ -10,7 +10,7 @@ export default function RoleEditor({ role }) {
     role: PropTypes.object
   };
   const dispatch = useDispatch();
-  const handleSubmit = ({ id, name }) => {
+  const handleRoleSubmit = ({ id, name }) => {
     dispatch(rolesActions.updateRole({ roleId: id, name }));
   };
   const closeEditor = () => {
@@ -26,9 +26,9 @@ export default function RoleEditor({ role }) {
   return (
     <Fragment>
       <FinalForm
-        onSubmit={handleSubmit}
+        onSubmit={handleRoleSubmit}
         initialValues={{ id, name }}
-        render={({ submitting }) => (
+        render={({ handleSubmit, submitting }) => (
           <Form noValidate onSubmit={handleSubmit}>
             <Field name="name" required="true">
               {({ input, meta }) => (

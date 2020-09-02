@@ -19,6 +19,7 @@ export default withPagination(
     pager: PropTypes.object.isRequired,
     pagerNavigation: PropTypes.node.isRequired
   };
+
   const collection = useSelector(getAllRoles);
 
   const displayEditor = useSelector(getEditorStatus);
@@ -27,7 +28,9 @@ export default withPagination(
     // Don't allow editing of Adminstrator or User roles
     return role === 'Administrator' || role === 'User' ? true : false;
   };
+
   const dispatch = useDispatch();
+
   const handleRoleEditor = (id) => {
     dispatch(
       editorActions.displayEditor({
@@ -36,6 +39,7 @@ export default withPagination(
       })
     );
   };
+
   const handleRoleUsers = (id) => {
     dispatch(
       editorActions.displayEditor({
@@ -44,6 +48,7 @@ export default withPagination(
       })
     );
   };
+
   const handleAssignRole = (id) => {
     dispatch(
       editorActions.displayEditor({
