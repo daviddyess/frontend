@@ -14,13 +14,11 @@ export default withPagination(
   rolesActions.requestRoles,
   getAllRoles,
   getRolesPager
-)(function Roles({ pager, pagerNavigation }) {
+)(function Roles({ collection, pager, pagerNavigation }) {
   Roles.propTypes = {
     pager: PropTypes.object.isRequired,
     pagerNavigation: PropTypes.node.isRequired
   };
-
-  const collection = useSelector(getAllRoles);
 
   const displayEditor = useSelector(getEditorStatus);
 
