@@ -24,7 +24,9 @@ export default withPagination(
 
   const noEdit = (role) => {
     // Don't allow editing of Adminstrator or User roles
-    return role === 'Administrator' || role === 'User' ? true : false;
+    return role === 'Administrator' || role === 'User' || role === 'Guest'
+      ? true
+      : false;
   };
 
   const dispatch = useDispatch();

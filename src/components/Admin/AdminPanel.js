@@ -2,13 +2,59 @@ import { Helmet } from 'react-helmet';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Breadcrumbs from 'components/Breadcrumbs/Breadcrumbs';
-import { Col } from 'react-bootstrap';
+import { Card, Col, Row } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Stats from './Stats';
 
 export default function AdminPanel() {
   const panels = [
     {
+      name: 'Ingredients',
+      icon: 'bezier-curve',
+      menu: [
+        {
+          name: 'Flavors',
+          icon: 'eye-dropper',
+          title: 'Manage Flavors',
+          url: 'admin/flavors'
+        }
+      ]
+    },
+    {
       name: 'Roles',
-      url: '/admin/roles'
+      icon: 'user-shield',
+      menu: [
+        {
+          name: 'Roles',
+          icon: 'user-shield',
+          title: 'Manage Roles',
+          url: '/admin/roles'
+        }
+      ]
+    },
+    {
+      name: 'Users',
+      icon: 'users',
+      menu: [
+        {
+          name: 'Users',
+          icon: 'users-cog',
+          title: 'Manage Users',
+          url: '/admin/users'
+        }
+      ]
+    },
+    {
+      name: 'Database',
+      icon: 'database',
+      menu: [
+        {
+          name: 'Migrations',
+          icon: 'clock',
+          title: 'Data Migrations',
+          url: '/admin/migrations'
+        }
+      ]
     }
   ];
 
@@ -16,17 +62,35 @@ export default function AdminPanel() {
     <Col>
       <Helmet title="Administration - Home" />
       <Breadcrumbs base="home" active="Admin" />
-      The new admin panel
-      <ul>
+      <Row>
         {panels &&
           panels.map((panel, index) => {
             return (
-              <li key={index}>
-                <Link to={panel.url}>{panel.name}</Link>
-              </li>
+              <Col key={index} xs={1} sm={3}>
+                <Card border="info">
+                  <Card.Header className="text-center">
+                    <FontAwesomeIcon icon={panel.icon} /> {panel.name}
+                  </Card.Header>
+                  <Card.Body>
+                    {panel.menu.map((link, linkIndex) => {
+                      return (
+                        <h3 key={linkIndex}>
+                          <FontAwesomeIcon icon={link.icon} />
+                          <Link className="ml-3" to={link.url}>
+                            {link.name}
+                          </Link>
+                        </h3>
+                      );
+                    })}
+                  </Card.Body>
+                </Card>
+              </Col>
             );
           })}
-      </ul>
+      </Row>
+      <Row className="pt-3">
+        <Stats />
+      </Row>
     </Col>
   );
 }
