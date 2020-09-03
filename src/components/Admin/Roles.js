@@ -16,6 +16,7 @@ export default withPagination(
   getRolesPager
 )(function Roles({ collection, pager, pagerNavigation }) {
   Roles.propTypes = {
+    collection: PropTypes.array.isRequired,
     pager: PropTypes.object.isRequired,
     pagerNavigation: PropTypes.node.isRequired
   };
@@ -31,29 +32,11 @@ export default withPagination(
 
   const dispatch = useDispatch();
 
-  const handleRoleEditor = (id) => {
+  const handleEditor = (editor, status) => {
     dispatch(
       editorActions.displayEditor({
-        editor: 'adminRole',
-        status: id
-      })
-    );
-  };
-
-  const handleRoleUsers = (id) => {
-    dispatch(
-      editorActions.displayEditor({
-        editor: 'adminRoleUsers',
-        status: id
-      })
-    );
-  };
-
-  const handleAssignRole = (id) => {
-    dispatch(
-      editorActions.displayEditor({
-        editor: 'adminRoleUser',
-        status: id
+        editor,
+        status
       })
     );
   };
@@ -80,20 +63,20 @@ export default withPagination(
                   <td>{role.name}</td>
                   <td>
                     <Button
-                      onClick={() => handleRoleUsers(role.id)}
+                      onClick={() => handleEditor('adminRoleUsers', role.id)}
                       className="mr-1"
                     >
                       Users
                     </Button>
                     <Button
-                      onClick={() => handleAssignRole(role.id)}
+                      onClick={() => handleEditor('adminRoleUser', role.id)}
                       className="mr-1"
                     >
                       Assign
                     </Button>
                     {!noEdit(role.name) && (
                       <Button
-                        onClick={() => handleRoleEditor(role.id)}
+                        onClick={() => handleEditor('adminRole', role.id)}
                         className="mr-1"
                       >
                         Edit
