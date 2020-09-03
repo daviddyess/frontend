@@ -8,9 +8,12 @@ export const imports = {
       /* webpackChunkName: "admin-migrations" */ 'components/Admin/Migrations'
     ),
   Roles: () =>
-    import(/* webpackChunkName: "admin-roles" */ 'components/Admin/Roles')
+    import(/* webpackChunkName: "admin-roles" */ 'components/Admin/Roles'),
+  Users: () =>
+    import(/* webpackChunkName: "admin-roles" */ 'components/Admin/Users')
 };
 
 export const AdminPanel = lazy(imports.AdminPanel);
 export const Migrations = lazy(imports.Migrations);
 export const Roles = lazy(imports.Roles);
+export const Users = lazy(imports.Users);
