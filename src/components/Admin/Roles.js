@@ -9,6 +9,7 @@ import { actions as rolesActions } from 'reducers/roles';
 import { getEditorStatus } from 'selectors/editor';
 import { getAllRoles, getRolesPager } from 'selectors/roles';
 import RoleEditor from 'components/Admin/Roles/Editor';
+import RoleUsers from 'components/Admin/Roles/Users';
 
 export default withPagination(
   rolesActions.requestRoles,
@@ -93,7 +94,9 @@ export default withPagination(
                 ) : null}
                 {displayEditor.adminRoleUsers === role.id ? (
                   <tr>
-                    <td colSpan="3">Users</td>
+                    <td colSpan="3">
+                      <RoleUsers role={role} />
+                    </td>
                   </tr>
                 ) : null}
                 {displayEditor.adminRoleUser === role.id ? (
